@@ -140,9 +140,9 @@ const Home = () => {
                         <span className="title-orange">BLOCKBUSTERS</span>
                         <span className="title-dot">.</span>
                     </h1>
-                    {/* <p className="hero-subtitle-description">
+                    <p className="hero-subtitle-description">
                         Leverage machine learning to analyze Hollywood and Indian cinema. Get data-driven insights on revenue, ratings, and success factors before the cameras roll.
-                    </p> */}
+                    </p>
                 </div>
 
                 {/* Bottom Horizontal Line */}
