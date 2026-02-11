@@ -1,0 +1,243 @@
+/* =========================================
+   Movie Card Styles - Premium Dark Theme
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap');
+
+.movie-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.movie-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Poster Container */
+.movie-card-poster {
+    position: relative;
+    aspect-ratio: 2/3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #141414;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.4s ease;
+}
+
+.movie-card:hover .movie-card-poster {
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 77, 0, 0.3);
+}
+
+.movie-card-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.movie-card:hover .movie-card-poster img {
+    transform: scale(1.08);
+}
+
+.poster-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: #444444;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+/* Rating Badge */
+.card-rating {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffc107;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.star {
+    font-size: 0.75rem;
+}
+
+/* Overlay */
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.98) 0%,
+            rgba(0, 0, 0, 0.7) 40%,
+            transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.movie-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.overlay-content {
+    margin-bottom: 14px;
+}
+
+/* Category Tags */
+.category-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.category-tag.blockbuster {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.category-tag.hit {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.category-tag.average {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.category-tag.flop {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.overlay-year {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-left: 10px;
+}
+
+.overlay-genres {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.8rem;
+    color: #888888;
+    margin-top: 4px;
+}
+
+/* View Details Button */
+.overlay-btn {
+    width: 100%;
+    padding: 12px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #000000;
+    background: linear-gradient(135deg, #ff4d00, #ffa500);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.overlay-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(255, 77, 0, 0.4);
+}
+
+/* Card Info */
+.movie-card-info {
+    padding: 16px 4px 0;
+}
+
+.movie-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.movie-card:hover .movie-card-title {
+    color: #ff4d00;
+}
+
+.movie-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.8rem;
+    color: #666666;
+}
+
+.meta-dot {
+    opacity: 0.4;
+}
+
+.industry-tag {
+    text-transform: capitalize;
+    color: #888888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-overlay {
+        opacity: 1;
+        background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.95) 0%,
+                transparent 100%);
+        padding: 16px;
+    }
+
+    .overlay-btn {
+        display: none;
+    }
+
+    .movie-card-poster {
+        border-radius: 12px;
+    }
+
+    .movie-card-title {
+        font-size: 0.85rem;
+    }
+
+    .card-rating {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}

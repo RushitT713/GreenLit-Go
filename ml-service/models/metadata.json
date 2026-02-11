@@ -1,0 +1,13 @@
+{
+  "trained_at": "2026-02-09T21:38:43.061319",
+  "n_features": 29,
+  "categories": [
+    "Average",
+    "Blockbuster",
+    "Flop",
+    "Hit",
+    "Super Hit"
+  ],
+  "use_tuning": true,
+  "n_trials": 50
+}

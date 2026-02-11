@@ -1,0 +1,206 @@
+/* Navbar Styles - Exact match with 3-column layout */
+
+/* Import Syne font as fallback for TT Firs Neue */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #000000;
+    border-bottom: 2px solid #3d3d3d;
+}
+
+.navbar-container {
+    display: flex;
+    align-items: stretch;
+    height: 70px;
+    width: 100%;
+}
+
+/* Column Base Styles */
+.navbar-column {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* Column 1: Logo Section (smaller) */
+.navbar-logo-section {
+    flex: 0 0 220px;
+    justify-content: center;
+    padding: 0 30px;
+}
+
+/* Column 2: Navigation Section (wider, takes remaining space) */
+.navbar-nav-section {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Column 3: Empty Section (same width as logo) */
+.navbar-empty-section {
+    flex: 0 0 220px;
+}
+
+/* Vertical Divider */
+.navbar-divider {
+    width: 2px;
+    height: 100%;
+    background-color: #3d3d3d;
+}
+
+/* Logo Styling */
+.navbar-logo {
+    text-decoration: none;
+    font-size: 1.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+}
+
+.logo-white {
+    color: #ffffff;
+}
+
+.logo-icon {
+    color: #ff8300;
+    margin-right: 10px;
+    font-size: 1.4rem;
+}
+
+.logo-orange {
+    color: #ff8300;
+    margin-left: 4px;
+}
+
+/* Navigation Links */
+.navbar-nav {
+    display: flex;
+    gap: 50px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 400;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+    transition: color 0.2s ease;
+    padding: 8px 0;
+}
+
+.nav-link:hover {
+    color: #ff8300;
+}
+
+.nav-link.active {
+    color: #ff8300;
+}
+
+/* Mobile Toggle - Hidden by default */
+.navbar-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    position: absolute;
+    right: 20px;
+}
+
+.navbar-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggle.open span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar-toggle.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.navbar-toggle.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .navbar-logo-section {
+        flex: 0 0 140px;
+    }
+
+    .navbar-empty-section {
+        flex: 0 0 140px;
+    }
+
+    .navbar-nav {
+        gap: 30px;
+    }
+
+    .nav-link {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-toggle {
+        display: flex;
+    }
+
+    .navbar-divider:last-of-type,
+    .navbar-empty-section {
+        display: none;
+    }
+
+    .navbar-nav-section {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: #000000;
+        border-bottom: 1px solid #3d3d3d;
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-nav-section:has(.navbar-nav.open) {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        gap: 0;
+        padding: 10px 20px;
+    }
+
+    .navbar-nav.open {
+        transform: translateY(0);
+    }
+
+    .nav-link {
+        padding: 16px 0;
+        border-bottom: 1px solid #3d3d3d;
+        display: block;
+    }
+}

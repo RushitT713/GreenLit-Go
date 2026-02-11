@@ -1,0 +1,479 @@
+/* Home Page Styles - Exact match to UI design */
+
+/* Import Syne font as fallback for TT Firs Neue */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aboreto&family=Alumni+Sans+Pinstripe:ital@0;1&family=Bebas+Neue&family=Cal+Sans&family=Fredericka+the+Great&family=Notable&family=Oswald:wght@200..700&family=Patrick+Hand+SC&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Satisfy&family=Sekuya&family=Skranji:wght@400;700&family=Syne:wght@400..800&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --bg-black: #0a0a0a;
+    --bg-dark: #141414;
+    --grid-color: #2a2a2a;
+    --accent-orange: #ff4d00;
+    --accent-gold: #ffa500;
+    --text-white: #ffffff;
+    --text-gray: #9a9a9a;
+}
+
+body {
+    font-family: 'Work Sans', sans-serif;
+}
+
+/* ===== Scroll Reveal Animations ===== */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Fade in from left */
+.scroll-reveal.fade-left {
+    transform: translateX(-40px);
+}
+
+.scroll-reveal.fade-left.revealed {
+    transform: translateX(0);
+}
+
+/* Fade in from right */
+.scroll-reveal.fade-right {
+    transform: translateX(40px);
+}
+
+.scroll-reveal.fade-right.revealed {
+    transform: translateX(0);
+}
+
+/* Scale up */
+.scroll-reveal.scale-up {
+    transform: scale(0.9);
+}
+
+.scroll-reveal.scale-up.revealed {
+    transform: scale(1);
+}
+
+/* ===== Simple Fade-In Animation ===== */
+.fade-in {
+    opacity: 0;
+    animation: fadeInAnimation 1s ease-out forwards;
+    animation-delay: 0.2s;
+}
+
+@keyframes fadeInAnimation {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* FadeInUp Animation for Hero */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Hero Section ===== */
+.hero {
+    position: relative;
+    min-height: 120vh;
+    background: #000000;
+    overflow: hidden;
+    padding-top: 70px;
+}
+
+/* Vertical Grey Dividers (4 lines) - BEHIND the image */
+.hero-divider {
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    width: 2px;
+    background-color: #3d3d3d;
+    z-index: 1;
+    /* Behind image */
+}
+
+/* Divider positions - matching navbar's fixed columns */
+.divider-1 {
+    left: 238px;
+}
+
+.divider-2 {
+    left: calc(238px + ((100% - 476px) / 3));
+}
+
+.divider-3 {
+    left: calc(238px + ((100% - 476px) * 2 / 3));
+}
+
+.divider-4 {
+    right: 220px;
+}
+
+/* Background Image Layer - IN FRONT of lines */
+.hero-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/hero-bg-removebg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 2;
+    /* In front of dividers */
+}
+
+/* Gradient Overlay for text visibility */
+.hero-gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right,
+            rgba(0, 0, 0, 0.7) 0%,
+            rgba(0, 0, 0, 0.5) 30%,
+            rgba(0, 0, 0, 0.2) 50%,
+            transparent 70%);
+    z-index: 3;
+    /* Above image, below text */
+}
+
+/* Hero Text Content (on top of everything) */
+.hero-content {
+    position: absolute;
+    top: 42%;
+    left: 70px;
+    transform: translateY(-60%);
+    z-index: 10;
+    max-width: 800px;
+}
+
+.hero-title {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -3px;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+.title-white {
+    color: #ffffff;
+}
+
+.title-orange {
+    color: #ff8300;
+}
+
+.title-dot {
+    color: #ff8300;
+}
+
+/* .hero-subtitle-description {
+    font-size: 1.1rem;
+    color: #ffffff;
+    line-height: 1.6;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+    font-weight: 400;
+    margin-top: -10px;
+    margin-left: -35px;
+} */
+
+/* Bottom Horizontal Line */
+.hero-bottom-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #3d3d3d;
+    z-index: 5;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 1200px) {
+    .hero-title {
+        font-size: 4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.8rem;
+        letter-spacing: -2px;
+    }
+
+    .hero-content {
+        left: 20px;
+        right: 20px;
+    }
+
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .hero-divider {
+        display: none;
+    }
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 5rem;
+    position: relative;
+    z-index: 5;
+    /* In front of divider lines */
+}
+
+.section-label {
+    color: var(--accent-orange);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -2px;
+    margin-bottom: 1rem;
+}
+
+.section-description {
+    color: var(--text-gray);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ===== Capabilities Section ===== */
+.capabilities {
+    position: relative;
+    background: #000000;
+    padding: 80px 60px;
+    min-height: 80vh;
+}
+
+/* Vertical Grey Dividers - continuing from Hero */
+.capabilities-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #3d3d3d;
+    z-index: 1;
+}
+
+.capabilities-divider.divider-1 {
+    left: 238px;
+}
+
+.capabilities-divider.divider-2 {
+    left: calc(238px + ((100% - 476px) / 3));
+}
+
+.capabilities-divider.divider-3 {
+    left: calc(238px + ((100% - 476px) * 2 / 3));
+}
+
+.capabilities-divider.divider-4 {
+    right: 220px;
+}
+
+/* Capabilities Title */
+.capabilities-title {
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 60px;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+    position: relative;
+    z-index: 5;
+}
+
+/* Capabilities Grid - 3x2 layout */
+.capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+}
+
+/* Capability Card */
+.capability-card {
+    background: #111111;
+    border: 1px solid #3d3d3d;
+    border-radius: 16px;
+    padding: 35px 30px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover Animation - Lift + Glow */
+.capability-card:hover {
+    transform: translateY(-8px);
+    border-color: #ff8300;
+    box-shadow:
+        0 10px 30px rgba(255, 131, 0, 0.15),
+        0 0 0 1px rgba(255, 131, 0, 0.3);
+}
+
+/* Orange Top Bar - slides in on hover */
+.capability-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.capability-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Card Icon */
+.capability-icon {
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* Card Title */
+.capability-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+}
+
+/* Card Description */
+.capability-desc {
+    font-size: 0.95rem;
+    color: #888888;
+    line-height: 1.6;
+    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+}
+
+/* Bottom Horizontal Line */
+.capabilities-bottom-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #3d3d3d;
+}
+
+/* ===== Capabilities Responsive ===== */
+@media (max-width: 1024px) {
+    .capabilities-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .capabilities {
+        padding: 60px 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .capabilities-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .capabilities {
+        padding: 40px 20px;
+    }
+
+    .capabilities-title {
+        font-size: 2rem;
+    }
+
+    .capabilities-divider {
+        display: none;
+    }
+}
+
+/* ===== Stats Section ===== */
+.stats {
+    position: relative;
+    z-index: 2;
+    background: var(--bg-dark);
+    border-top: 1px solid var(--grid-color);
+    border-bottom: 1px solid var(--grid-color);
+    padding: 5rem 3rem;
+}
+
+.stats-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+}
+
+.stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    /* Keeps 2018-2024 on one line */
+}
+
+.stat-label {
+    font-family: 'Work Sans', sans-serif;
+    color: var(--text-gray);
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}

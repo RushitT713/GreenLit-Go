@@ -1,0 +1,61 @@
+{
+  "tuned_at": "2026-02-09T21:16:53.971544",
+  "n_trials": 30,
+  "cv_folds": 5,
+  "best_params": {
+    "xgb_regressor": {
+      "n_estimators": 411,
+      "max_depth": 3,
+      "learning_rate": 0.07653644011757374,
+      "min_child_weight": 7,
+      "subsample": 0.7951893439818288,
+      "colsample_bytree": 0.9995062582874144,
+      "reg_alpha": 0.10130492013778475,
+      "reg_lambda": 0.015239777969716933,
+      "random_state": 42,
+      "n_jobs": -1
+    },
+    "lgb_regressor": {
+      "n_estimators": 271,
+      "max_depth": 3,
+      "learning_rate": 0.07416825849621515,
+      "num_leaves": 36,
+      "min_child_samples": 35,
+      "subsample": 0.6938336215231733,
+      "colsample_bytree": 0.9275027352328515,
+      "reg_alpha": 6.479872737032084e-08,
+      "reg_lambda": 2.8272439218142667e-05,
+      "random_state": 42,
+      "n_jobs": -1,
+      "verbose": -1
+    },
+    "xgb_classifier": {
+      "n_estimators": 156,
+      "max_depth": 8,
+      "learning_rate": 0.04345454109729477,
+      "min_child_weight": 3,
+      "subsample": 0.8447411578889518,
+      "colsample_bytree": 0.6557975442608167,
+      "reg_alpha": 4.258943089524393e-06,
+      "reg_lambda": 1.9826980964985924e-05,
+      "random_state": 42,
+      "n_jobs": -1,
+      "use_label_encoder": false,
+      "eval_metric": "mlogloss"
+    },
+    "lgb_classifier": {
+      "n_estimators": 111,
+      "max_depth": 10,
+      "learning_rate": 0.03301605116425189,
+      "num_leaves": 20,
+      "min_child_samples": 26,
+      "subsample": 0.6991645872598863,
+      "colsample_bytree": 0.6930370104541355,
+      "reg_alpha": 6.868155536372898e-05,
+      "reg_lambda": 0.007905582828632279,
+      "random_state": 42,
+      "n_jobs": -1,
+      "verbose": -1
+    }
+  }
+}

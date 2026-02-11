@@ -1,0 +1,26 @@
+# Python ML Service
+flask>=3.0.0
+flask-cors>=4.0.0
+gunicorn>=21.0.0
+
+# Data Science & ML
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+lightgbm>=4.1.0
+optuna>=3.4.0
+joblib>=1.3.0
+pymongo>=4.6.0
+
+# Explainable AI
+shap>=0.44.0
+lime>=0.2.0
+
+# Data Collection
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Utilities
+python-dotenv>=1.0.0
