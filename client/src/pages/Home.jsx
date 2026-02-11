@@ -35,8 +35,8 @@ const Home = () => {
     const statsRef = useRef(null);
 
     // Counter values
-    const moviesCount = useCountUp(1000, 2000, statsVisible);
-    const accuracyCount = useCountUp(85, 2000, statsVisible);
+    const moviesCount = useCountUp(1600, 2000, statsVisible);
+    const accuracyCount = useCountUp(93, 2000, statsVisible);
     const industriesCount = useCountUp(5, 1500, statsVisible);
 
     // Capabilities data
