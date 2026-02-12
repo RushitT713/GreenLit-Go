@@ -93,7 +93,7 @@ export const DirectorSearch = ({ onSelect, selectedDirector, onClear }) => {
                             </span>
                         </div>
                     </div>
-                    <button className="remove-btn" onClick={onClear}>✕</button>
+                    <button type="button" className="remove-btn" onClick={onClear}>✕</button>
                 </div>
             </div>
         );
@@ -263,7 +263,7 @@ export const CastSearch = ({ selectedCast = [], onCastChange, combinedScore = 0 
                             )}
                             <span className="cast-name">{actor.name}</span>
                             <span className="cast-score">{actor.metrics?.starPower || 0}</span>
-                            <button className="remove-chip" onClick={() => handleRemove(actor.id)}>✕</button>
+                            <button type="button" className="remove-chip" onClick={() => handleRemove(actor.id)}>✕</button>
                         </div>
                     ))}
                 </div>
