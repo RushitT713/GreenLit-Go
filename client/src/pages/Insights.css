@@ -1,0 +1,519 @@
+/* =========================================
+   Insights Page — Premium Bento Dashboard
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap');
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+:root {
+    --bg-black: #0a0a0a;
+    --bg-dark: #141414;
+    --grid-color: #2a2a2a;
+    --accent-orange: #ff4d00;
+    --accent-gold: #ffa500;
+    --text-white: #ffffff;
+    --text-gray: #9a9a9a;
+}
+
+/* ===== Page Shell ===== */
+.insights-page {
+    min-height: 100vh;
+    background: #000000;
+    padding-bottom: 80px;
+}
+
+/* ===== Header (kept) ===== */
+.insights-header {
+    position: relative;
+    padding: 140px 0 60px;
+    overflow: hidden;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.insights-header-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 77, 0, 0.08), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 20% 100%, rgba(255, 165, 0, 0.05), transparent),
+        #000000;
+    z-index: 0;
+}
+
+.insights-header-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.insights-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.insights-subtitle {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 1.15rem;
+    color: #888888;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* ===== Filter Pills ===== */
+.industry-filter {
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    border-radius: 50px;
+    margin-top: 10px;
+}
+
+.filter-pill {
+    padding: 14px 28px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #666666;
+    background: transparent;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.filter-pill:hover {
+    color: #ffffff;
+    background: #1a1a1a;
+}
+
+.filter-pill.active {
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+    color: #000000;
+}
+
+/* ===== Loading ===== */
+.insights-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 16px;
+    color: #888888;
+}
+
+.loading-spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(255, 77, 0, 0.15);
+    border-top: 3px solid var(--accent-orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== Content Container ===== */
+.insights-content {
+    padding: 60px 0 0;
+}
+
+.insights-content .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* =========================================
+   BENTO GRID — The Magic Layout
+   ========================================= */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+}
+
+/* ─── Cell Spans ─── */
+.bento-cell.stat-cell {
+    grid-column: span 1;
+    /* 1 of 6 → five stat cards across, last wraps on the 6th col */
+}
+
+/* 5 stat cards in first row: use a special rule */
+.bento-cell.stat-cell:nth-child(1) {
+    grid-column: 1 / 2;
+}
+
+.bento-cell.stat-cell:nth-child(2) {
+    grid-column: 2 / 3;
+}
+
+.bento-cell.stat-cell:nth-child(3) {
+    grid-column: 3 / 4;
+}
+
+.bento-cell.stat-cell:nth-child(4) {
+    grid-column: 4 / 5;
+}
+
+.bento-cell.stat-cell:nth-child(5) {
+    grid-column: 5 / 7;
+}
+
+/* last stat stretches to fill */
+
+.bento-cell.span-2 {
+    grid-column: span 2;
+}
+
+.bento-cell.span-3 {
+    grid-column: span 3;
+}
+
+.bento-cell.span-4 {
+    grid-column: span 4;
+}
+
+.bento-cell.span-6 {
+    grid-column: span 6;
+}
+
+/* =========================================
+   STAT CARDS
+   ========================================= */
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 12px;
+    border-radius: 20px;
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(.22, 1, .36, 1);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative soft glow behind the icon */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(255, 77, 0, 0.12), transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stat-card:hover {
+    border-color: rgba(255, 77, 0, 0.35);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(255, 77, 0, 0.08);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-label {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.75rem;
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================================
+   CHART CARDS
+   ========================================= */
+.chart-card {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    border-radius: 24px;
+    padding: 28px 28px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(.22, 1, .36, 1);
+    height: 100%;
+}
+
+/* Top accent strip */
+.chart-card-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.chart-card:hover {
+    border-color: #3a3a3a;
+    box-shadow: 0 4px 40px rgba(255, 77, 0, 0.05);
+}
+
+.chart-card:hover .chart-card-accent {
+    opacity: 1;
+}
+
+/* ─── Chart Header ─── */
+.chart-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.chart-label-bar {
+    width: 3px;
+    min-height: 36px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--accent-orange), var(--accent-gold));
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.chart-desc {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.82rem;
+    color: #666666;
+    margin: 4px 0 0;
+    line-height: 1.5;
+}
+
+/* =========================================
+   APEXCHARTS DARK OVERRIDES
+   ========================================= */
+.apexcharts-canvas {
+    background: transparent !important;
+}
+
+.apexcharts-tooltip {
+    background: #141414 !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    padding: 2px !important;
+}
+
+.apexcharts-tooltip-title {
+    background: #1a1a1a !important;
+    border-bottom: 1px solid #2a2a2a !important;
+    color: #ffffff !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+}
+
+.apexcharts-tooltip-text {
+    font-family: 'Work Sans', sans-serif !important;
+    color: #cccccc !important;
+}
+
+.apexcharts-tooltip-series-group {
+    padding: 4px 10px !important;
+}
+
+.apexcharts-legend-text {
+    color: #999 !important;
+    font-family: 'Work Sans', sans-serif !important;
+}
+
+.apexcharts-yaxis-label,
+.apexcharts-xaxis-label {
+    fill: #666 !important;
+    font-family: 'Work Sans', sans-serif !important;
+}
+
+.apexcharts-grid line {
+    stroke: rgba(255, 255, 255, 0.06) !important;
+}
+
+.apexcharts-gridline {
+    stroke: rgba(255, 255, 255, 0.06) !important;
+}
+
+.apexcharts-radar-series polygon {
+    stroke: rgba(255, 255, 255, 0.08) !important;
+}
+
+.apexcharts-treemap-rect {
+    rx: 6;
+    ry: 6;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 1200px) {
+    .bento-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .bento-cell.stat-cell {
+        grid-column: span 1 !important;
+    }
+
+    .bento-cell.stat-cell:nth-child(5) {
+        grid-column: span 1 !important;
+    }
+
+    .bento-cell.span-4 {
+        grid-column: span 4;
+    }
+
+    .bento-cell.span-6 {
+        grid-column: span 4;
+    }
+
+    .bento-cell.span-3 {
+        grid-column: span 2;
+    }
+
+    .bento-cell.span-2 {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .insights-header {
+        padding: 100px 0 40px;
+    }
+
+    .insights-title {
+        font-size: 2rem;
+    }
+
+    .insights-content .container {
+        padding: 0 16px;
+    }
+
+    .bento-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .bento-cell.stat-cell {
+        grid-column: span 1 !important;
+    }
+
+    .bento-cell.span-2,
+    .bento-cell.span-3,
+    .bento-cell.span-4,
+    .bento-cell.span-6 {
+        grid-column: 1 / -1;
+    }
+
+    .chart-card {
+        padding: 20px 16px 12px;
+    }
+
+    .stat-card {
+        padding: 18px 10px;
+    }
+
+    .stat-value {
+        font-size: 1.15rem;
+    }
+
+    .industry-filter {
+        flex-wrap: wrap;
+        border-radius: 16px;
+    }
+
+    .filter-pill {
+        padding: 10px 18px;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bento-cell.stat-cell {
+        grid-column: span 1 !important;
+    }
+
+    .insights-header {
+        padding: 80px 0 30px;
+    }
+
+    .insights-content {
+        padding: 30px 0 0;
+    }
+}

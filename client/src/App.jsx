@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import ReleasedMovies from './pages/ReleasedMovies';
 import MovieDetail from './pages/MovieDetail';
 import UpcomingDashboard from './pages/UpcomingDashboard';
+import Insights from './pages/Insights';
 import About from './pages/About';
 import './App.css';
 
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/movies" element={<ReleasedMovies />} />
             <Route path="/movies/:id" element={<MovieDetail />} />
+            <Route path="/insights" element={<Insights />} />
             <Route path="/upcoming" element={<UpcomingDashboard />} />
             <Route path="/about" element={<About />} />
           </Routes>

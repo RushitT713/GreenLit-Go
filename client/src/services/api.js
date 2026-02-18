@@ -39,6 +39,11 @@ export const trendsService = {
   getSeasonal: (params = {}) => api.get('/trends/seasonal', { params }),
   getTalent: (type, params = {}) => api.get(`/trends/talent/${type}`, { params }),
   getRegional: () => api.get('/trends/regional'),
+  getBudgetRevenue: (params = {}) => api.get('/trends/budget-revenue', { params }),
+  getYoutubeHype: (params = {}) => api.get('/trends/youtube-hype', { params }),
+  getProductionHouses: (params = {}) => api.get('/trends/production-houses', { params }),
+  getOpeningWeekend: (params = {}) => api.get('/trends/opening-weekend', { params }),
+  getCriticAudience: (params = {}) => api.get('/trends/critic-audience', { params }),
 };
 
 // Talents API (Director/Actor Lookup)

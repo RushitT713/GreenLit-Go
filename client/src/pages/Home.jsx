@@ -63,13 +63,13 @@ const Home = () => {
         },
         {
             icon: '🎭',
-            title: 'Cast & Crew Impact',
+            title: 'Cast and Crew Impact',
             description: 'Understand how director, actors, and production company choices affect movie performance.'
         },
         {
             icon: '🌍',
             title: 'Dual Market Analysis',
-            description: 'Specialized models for both Hollywood and Indian cinema (Bollywood, Tollywood, Kollywood).'
+            description: 'Specialized models for both Hollywood and Indian cinema (Bollywood, Tollywood, Kollywood, Mollywood).'
         }
     ];
 

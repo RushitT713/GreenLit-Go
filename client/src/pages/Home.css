@@ -4,6 +4,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Aboreto&family=Alumni+Sans+Pinstripe:ital@0;1&family=Bebas+Neue&family=Cal+Sans&family=Fredericka+the+Great&family=Notable&family=Oswald:wght@200..700&family=Patrick+Hand+SC&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Satisfy&family=Sekuya&family=Skranji:wght@400;700&family=Syne:wght@400..800&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
     --bg-black: #0a0a0a;
     --bg-dark: #141414;
@@ -15,7 +39,7 @@
 }
 
 body {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
 }
 
 /* ===== Scroll Reveal Animations ===== */
@@ -171,7 +195,7 @@ body {
     font-weight: 800;
     line-height: 1.05;
     letter-spacing: -3px;
-    font-family: 'TT Firs Neue', 'Syne', sans-serif;
+    font-family: 'Syne', 'TT Firs Neue', sans-serif;
     animation: fadeInUp 1s ease-out forwards;
 }
 

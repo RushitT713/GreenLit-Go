@@ -4,6 +4,31 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap');
 
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 .movie-card {
     display: flex;
     flex-direction: column;
@@ -63,7 +88,7 @@
     align-items: center;
     gap: 5px;
     padding: 6px 12px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.85rem;
     font-weight: 700;
     color: #ffc107;
@@ -105,7 +130,7 @@
 .category-tag {
     display: inline-block;
     padding: 4px 10px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -139,15 +164,15 @@
 }
 
 .overlay-year {
-    font-family: 'Syne', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #ffffff;
     margin-left: 10px;
 }
 
 .overlay-genres {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.8rem;
     color: #888888;
     margin-top: 4px;
@@ -157,7 +182,7 @@
 .overlay-btn {
     width: 100%;
     padding: 12px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     color: #000000;
@@ -200,7 +225,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.8rem;
     color: #666666;
 }

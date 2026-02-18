@@ -90,7 +90,7 @@ router.get('/seasonal', async (req, res) => {
   try {
     const { industry, genre } = req.query;
     
-    const matchStage = { releaseDate: { $exists: true } };
+    const matchStage = { releaseDate: { $exists: true, $ne: null, $type: 'date' } };
     if (industry) matchStage.industry = industry;
     if (genre) matchStage.genres = genre;
 
@@ -201,6 +201,166 @@ router.get('/regional', async (req, res) => {
     ]);
 
     res.json(regionalTrends);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get budget vs revenue scatter data
+router.get('/budget-revenue', async (req, res) => {
+  try {
+    const { industry } = req.query;
+    
+    const matchStage = { budget: { $gt: 0 }, revenue: { $gt: 0 } };
+    if (industry) matchStage.industry = industry;
+
+    const data = await Movie.find(matchStage)
+      .select('title budget revenue industry predictions.successCategory voteAverage year')
+      .limit(500)
+      .lean();
+
+    const formatted = data.map(m => ({
+      title: m.title,
+      budget: m.budget,
+      revenue: m.revenue,
+      roi: ((m.revenue - m.budget) / m.budget * 100).toFixed(1),
+      category: m.predictions?.successCategory || 'Unknown',
+      rating: m.voteAverage,
+      industry: m.industry,
+      year: m.year
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// YouTube Hype vs Box Office — scatter (trailerViews vs revenue)
+router.get('/youtube-hype', async (req, res) => {
+  try {
+    const { industry } = req.query;
+    const matchStage = {
+      'socialMetrics.trailerViews': { $gt: 0 },
+      revenue: { $gt: 0 },
+    };
+    if (industry) matchStage.industry = industry;
+
+    const data = await Movie.find(matchStage)
+      .select('title socialMetrics.trailerViews revenue voteAverage predictions.successCategory industry year')
+      .limit(300)
+      .lean();
+
+    const formatted = data.map(m => ({
+      title: m.title,
+      trailerViews: m.socialMetrics?.trailerViews || 0,
+      revenue: m.revenue,
+      rating: m.voteAverage || 0,
+      category: m.predictions?.successCategory || 'Unknown',
+      industry: m.industry,
+      year: m.year,
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Production House Rankings — aggregated by company
+router.get('/production-houses', async (req, res) => {
+  try {
+    const { industry, limit = 15 } = req.query;
+    const matchStage = {
+      'productionCompanies.0': { $exists: true },
+      revenue: { $gt: 0 },
+    };
+    if (industry) matchStage.industry = industry;
+
+    const data = await Movie.aggregate([
+      { $match: matchStage },
+      { $unwind: '$productionCompanies' },
+      {
+        $group: {
+          _id: '$productionCompanies.name',
+          movieCount: { $sum: 1 },
+          avgRevenue: { $avg: '$revenue' },
+          totalRevenue: { $sum: '$revenue' },
+          avgRating: { $avg: '$voteAverage' },
+          avgBudget: { $avg: '$budget' },
+        },
+      },
+      { $match: { _id: { $ne: null }, movieCount: { $gte: 3 } } },
+      { $sort: { totalRevenue: -1 } },
+      { $limit: parseInt(limit) },
+    ]);
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Opening Weekend Strength — opening weekend as % of total revenue
+router.get('/opening-weekend', async (req, res) => {
+  try {
+    const { industry } = req.query;
+    const matchStage = {
+      'releaseStrategy.openingWeekendRevenue': { $gt: 0 },
+      revenue: { $gt: 0 },
+    };
+    if (industry) matchStage.industry = industry;
+
+    const data = await Movie.find(matchStage)
+      .select('title releaseStrategy.openingWeekendRevenue revenue year industry predictions.successCategory')
+      .sort({ revenue: -1 })
+      .limit(30)
+      .lean();
+
+    const formatted = data.map(m => ({
+      title: m.title,
+      openingWeekend: m.releaseStrategy?.openingWeekendRevenue || 0,
+      totalRevenue: m.revenue,
+      openingPct: parseFloat(((m.releaseStrategy?.openingWeekendRevenue || 0) / m.revenue * 100).toFixed(1)),
+      year: m.year,
+      industry: m.industry,
+      category: m.predictions?.successCategory || 'Unknown',
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Critic vs Audience Gap — RT critics - audience divergence
+router.get('/critic-audience', async (req, res) => {
+  try {
+    const { industry } = req.query;
+    const matchStage = {
+      rottenTomatoesScore: { $gt: 0 },
+      rottenTomatoesAudienceScore: { $gt: 0 },
+    };
+    if (industry) matchStage.industry = industry;
+
+    const data = await Movie.find(matchStage)
+      .select('title rottenTomatoesScore rottenTomatoesAudienceScore voteAverage year industry')
+      .lean();
+
+    const formatted = data
+      .map(m => ({
+        title: m.title,
+        criticsScore: m.rottenTomatoesScore,
+        audienceScore: m.rottenTomatoesAudienceScore,
+        gap: m.rottenTomatoesScore - m.rottenTomatoesAudienceScore,
+        rating: m.voteAverage || 0,
+        year: m.year,
+        industry: m.industry,
+      }))
+      .sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap))
+      .slice(0, 30);
+
+    res.json(formatted);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

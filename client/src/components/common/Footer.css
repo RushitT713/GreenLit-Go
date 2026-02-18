@@ -3,6 +3,31 @@
 /* Import fonts */
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap');
 
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Firs Neue';
+  src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 .footer {
     position: relative;
     background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
@@ -81,7 +106,7 @@
 }
 
 .footer-tagline {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 1rem;
     color: #666666;
     line-height: 1.7;
@@ -168,7 +193,7 @@
 
 .footer-list a,
 .footer-list span {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.95rem;
     color: #888888;
     text-decoration: none;
@@ -219,7 +244,7 @@
 }
 
 .footer-copyright {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 0.9rem;
     color: #555555;
 }
@@ -234,7 +259,7 @@
 }
 
 .footer-credits {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.85rem;
     color: #444444;
 }
