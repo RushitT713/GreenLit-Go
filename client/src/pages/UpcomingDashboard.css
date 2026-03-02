@@ -4,6 +4,30 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap');
 
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --bg-black: #0a0a0a;
     --bg-dark: #141414;
@@ -68,7 +92,7 @@
 }
 
 .dashboard-subtitle {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 1.15rem;
     color: #888888;
     max-width: 600px;
@@ -87,7 +111,7 @@
 
 .dashboard-tab {
     padding: 14px 28px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-weight: 600;
     font-size: 0.9rem;
     color: #666666;
@@ -192,7 +216,7 @@
 }
 
 .form-label {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     color: #aaaaaa;
@@ -207,7 +231,7 @@
 /* Inputs */
 .input {
     padding: 14px 18px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 1rem;
     color: #ffffff;
     background: #141414;
@@ -240,7 +264,7 @@
 
 .industry-option {
     padding: 12px 20px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     background: #141414;
@@ -272,7 +296,7 @@
 
 .chip {
     padding: 10px 18px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.85rem;
     font-weight: 500;
     background: #141414;
@@ -305,7 +329,7 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     color: #aaaaaa;
     font-size: 0.95rem;
 }
@@ -347,7 +371,7 @@
     justify-content: center;
     gap: 10px;
     padding: 18px 32px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 1rem;
     font-weight: 700;
     color: #000000;
@@ -414,7 +438,7 @@
 }
 
 .results-placeholder p {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     color: #666666;
     max-width: 320px;
     font-size: 1rem;
@@ -433,7 +457,7 @@
     background: #141414;
     border: 1px solid #2a2a2a;
     border-radius: 30px;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.85rem;
     color: #888888;
 }
@@ -541,7 +565,7 @@
 }
 
 .metric-label {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.9rem;
     color: #666666;
 }
@@ -576,7 +600,7 @@
 .feature-header {
     display: flex;
     justify-content: space-between;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 0.9rem;
 }
 
@@ -609,7 +633,7 @@
 }
 
 .card-description {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     color: #888888;
     margin-bottom: 32px;
     font-size: 1.05rem;
@@ -642,14 +666,14 @@
 }
 
 .coming-soon p {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     color: #888888;
 }
 
 .coming-soon ul {
     list-style: none;
     text-align: left;
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     color: #aaaaaa;
 }
 
@@ -672,6 +696,717 @@
     .results-placeholder {
         min-height: 400px;
     }
+}
+
+/* ===== What-If Simulation ===== */
+.sim-no-prediction {
+    text-align: center;
+    padding: 80px 40px;
+}
+
+.sim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.sim-controls {
+    padding: 32px;
+}
+
+.sim-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sim-control-group .form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.sim-changed-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #ff4d00;
+    background: rgba(255, 77, 0, 0.12);
+    border: 1px solid rgba(255, 77, 0, 0.3);
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sim-budget-presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.sim-preset-btn {
+    padding: 8px 16px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #aaaaaa;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sim-preset-btn:hover {
+    color: #ff4d00;
+    border-color: #ff4d00;
+    background: rgba(255, 77, 0, 0.08);
+}
+
+.sim-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.sim-actions .btn-secondary {
+    padding: 14px 24px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #aaaaaa;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.sim-actions .btn-secondary:hover {
+    color: #ffffff;
+    border-color: #444;
+}
+
+/* Simulation Results */
+.sim-results-content {
+    padding: 32px;
+}
+
+.sim-placeholder {
+    padding: 60px 32px;
+    text-align: center;
+}
+
+.sim-scenario-name {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.9rem;
+    color: #ff4d00;
+    background: rgba(255, 77, 0, 0.08);
+    border: 1px solid rgba(255, 77, 0, 0.2);
+    border-radius: 10px;
+    padding: 8px 16px;
+    margin-bottom: 24px;
+    display: inline-block;
+}
+
+.sim-comparison {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sim-compare-card {
+    flex: 1;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #2a2a2a;
+    background: #0f0f0f;
+}
+
+.sim-compare-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.sim-original {
+    border-color: #333;
+}
+
+.sim-modified {
+    border-color: rgba(255, 77, 0, 0.4);
+    background: rgba(255, 77, 0, 0.04);
+}
+
+.sim-category {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 14px;
+}
+
+.sim-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid #1a1a1a;
+}
+
+.sim-stat-label {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.sim-stat-value {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sim-delta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.sim-delta.positive {
+    color: #00c853;
+    background: rgba(0, 200, 83, 0.1);
+}
+
+.sim-delta.negative {
+    color: #ff5252;
+    background: rgba(255, 82, 82, 0.1);
+}
+
+.sim-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    color: #444;
+    padding: 0 4px;
+}
+
+.sim-chart {
+    margin-top: 8px;
+    border-top: 1px solid #1a1a1a;
+    padding-top: 16px;
+}
+
+/* ===== Optimal Release Tab ===== */
+.release-header {
+    padding: 32px;
+}
+
+.release-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.release-filters {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.release-filter-select {
+    min-width: 160px;
+    font-size: 0.85rem !important;
+}
+
+.release-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: #888;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.95rem;
+}
+
+.release-chart {
+    margin-top: 8px;
+}
+
+/* Recommendations */
+.release-recommendations {
+    margin-top: 24px;
+}
+
+.release-reco-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+}
+
+.release-reco-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.release-reco-card {
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.release-reco-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 77, 0, 0.4);
+}
+
+.release-reco-card.top-pick {
+    border-color: rgba(255, 77, 0, 0.5);
+    background: rgba(255, 77, 0, 0.04);
+}
+
+.reco-medal {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.reco-month {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.reco-score {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 16px;
+}
+
+.reco-score strong {
+    color: #ff4d00;
+    font-size: 1.1rem;
+}
+
+.reco-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reco-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-top: 1px solid #1a1a1a;
+}
+
+.reco-stat-label {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.reco-stat-value {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ddd;
+}
+
+.reco-click-hint {
+    display: block;
+    margin-top: 12px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.75rem;
+    color: #555;
+    transition: color 0.2s ease;
+}
+
+.release-reco-card:hover .reco-click-hint {
+    color: #ff4d00;
+}
+
+/* Competitive Window Analyzer */
+.competitive-section {
+    padding: 28px;
+    overflow: hidden;
+}
+
+.competitive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.competitive-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    color: #888;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.competitive-close:hover {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.competitive-score-card {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, rgba(15, 15, 15, 0.95), rgba(25, 25, 25, 0.9));
+    border: 1px solid #2a2a2a;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+}
+
+.competitive-score-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.comp-card-low {
+    border-color: rgba(0, 200, 83, 0.25);
+    box-shadow: 0 0 40px rgba(0, 200, 83, 0.06);
+}
+
+.comp-card-medium {
+    border-color: rgba(255, 165, 0, 0.25);
+    box-shadow: 0 0 40px rgba(255, 165, 0, 0.06);
+}
+
+.comp-card-high {
+    border-color: rgba(255, 82, 82, 0.25);
+    box-shadow: 0 0 40px rgba(255, 82, 82, 0.06);
+}
+
+.comp-score-left {
+    flex-shrink: 0;
+}
+
+.comp-score-ring {
+    position: relative;
+    width: 130px;
+    height: 130px;
+}
+
+.comp-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.comp-ring-bg {
+    fill: none;
+    stroke: #1a1a1a;
+    stroke-width: 5;
+}
+
+.comp-ring-fill {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 6px currentColor);
+}
+
+.comp-ring-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.comp-score-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+
+.comp-score-label {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.7rem;
+    color: #555;
+    margin-top: 2px;
+}
+
+.comp-score-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comp-level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 6px 16px;
+    border-radius: 24px;
+    width: fit-content;
+}
+
+.comp-badge-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: comp-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes comp-dot-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.6;
+        transform: scale(0.85);
+    }
+}
+
+.comp-badge-low {
+    background: rgba(0, 200, 83, 0.1);
+    color: #00c853;
+}
+
+.comp-badge-medium {
+    background: rgba(255, 165, 0, 0.1);
+    color: #ffa500;
+}
+
+.comp-badge-high {
+    background: rgba(255, 82, 82, 0.1);
+    color: #ff5252;
+}
+
+/* Progress bar */
+.comp-score-bar-wrap {
+    width: 100%;
+}
+
+.comp-score-bar-track {
+    width: 100%;
+    height: 6px;
+    background: #1a1a1a;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.comp-score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.comp-score-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.65rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stats row */
+.comp-stats-row {
+    display: flex;
+    gap: 0;
+    margin-top: 4px;
+}
+
+.comp-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0;
+    border-right: 1px solid #1f1f1f;
+}
+
+.comp-stat:last-child {
+    border-right: none;
+}
+
+.comp-stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.comp-stat-label {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.65rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+    text-align: center;
+}
+
+.competing-movies-list h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ccc;
+    margin-bottom: 12px;
+}
+
+.competing-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.competing-movie-card {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: #0f0f0f;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    align-items: flex-start;
+}
+
+.competing-movie-card:hover {
+    border-color: #333;
+    transform: translateY(-2px);
+}
+
+.comp-movie-poster {
+    width: 56px;
+    height: 84px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.comp-movie-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.comp-movie-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.comp-movie-date {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-bottom: 3px;
+}
+
+.comp-movie-meta {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.comp-anticipation-badge {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+.comp-anticipation-badge.anticipation-top {
+    background: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.comp-anticipation-badge.anticipation-high {
+    background: rgba(255, 140, 0, 0.12);
+    color: #ff8c00;
+    border: 1px solid rgba(255, 140, 0, 0.25);
+}
+
+.comp-anticipation-badge.anticipation-mid {
+    background: rgba(255, 255, 255, 0.05);
+    color: #999;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comp-movie-budget {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.8rem;
+    color: #aaa;
 }
 
 @media (max-width: 768px) {
@@ -720,5 +1455,52 @@
 
     .metric-value {
         font-size: 1.4rem;
+    }
+
+    .sim-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sim-comparison {
+        flex-direction: column;
+    }
+
+    .sim-arrow {
+        transform: rotate(90deg);
+        justify-content: center;
+    }
+
+    .sim-budget-presets {
+        flex-wrap: wrap;
+    }
+
+    .sim-actions {
+        flex-direction: column;
+    }
+
+    .release-header-top {
+        flex-direction: column;
+    }
+
+    .release-filters {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .release-filter-select {
+        min-width: 100%;
+    }
+
+    .release-reco-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .competitive-score-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .competing-movies-grid {
+        grid-template-columns: 1fr;
     }
 }
