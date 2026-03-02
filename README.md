@@ -1,6 +1,6 @@
 # GreenLit Go - Movie Success Prediction Web App
 
-AI-powered movie success prediction platform for Hollywood and Indian Cinema.
+Data-Driven Movie Success Prediction platform for Hollywood and Indian Cinema.
 
 ## 🎬 Features
 
