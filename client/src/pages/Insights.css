@@ -103,7 +103,7 @@
 .filter-pill {
     padding: 14px 28px;
     font-family: 'Syne', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.9rem;
     color: #666666;
     background: transparent;
@@ -265,7 +265,7 @@
 }
 
 .stat-value {
-    font-family: 'Syne', sans-serif;
+    font-family: 'TT Firs Neue', sans-serif;
     font-size: 1.45rem;
     font-weight: 700;
     color: #ffffff;
@@ -379,7 +379,7 @@
 }
 
 .apexcharts-tooltip-text {
-    font-family: 'Work Sans', sans-serif !important;
+    font-family: 'TT Firs Neue', sans-serif !important;
     color: #cccccc !important;
 }
 
@@ -389,13 +389,13 @@
 
 .apexcharts-legend-text {
     color: #999 !important;
-    font-family: 'Work Sans', sans-serif !important;
+    font-family: 'TT Firs Neue', sans-serif !important;
 }
 
 .apexcharts-yaxis-label,
 .apexcharts-xaxis-label {
     fill: #666 !important;
-    font-family: 'Work Sans', sans-serif !important;
+    font-family: 'TT Firs Neue', sans-serif !important;
 }
 
 .apexcharts-grid line {
