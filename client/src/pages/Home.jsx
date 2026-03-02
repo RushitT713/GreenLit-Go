@@ -39,39 +39,61 @@ const Home = () => {
     const accuracyCount = useCountUp(93, 2000, statsVisible);
     const industriesCount = useCountUp(5, 1500, statsVisible);
 
-    // Capabilities data
     const capabilities = [
         {
             icon: '💰',
             title: 'Revenue Prediction',
-            description: 'Predict box office gross with ML models trained on 575+ movies. Forecast opening weekend, domestic, and worldwide revenue.'
+            description: 'Predict box office gross with ML models trained on 1,600+ movies across multiple industries.'
         },
         {
             icon: '📊',
             title: 'Success Classification',
-            description: 'Categorize movies as Hit, Average, or Flop based on ROI analysis and comprehensive performance metrics.'
+            description: 'Categorize movies as Blockbuster, Hit, Average, or Flop based on ROI and performance metrics.'
         },
         {
             icon: '⭐',
             title: 'Rating Prediction',
-            description: 'Forecast IMDb scores and Rotten Tomatoes ratings before release using sentiment and buzz analysis.'
+            description: 'Forecast IMDb scores and audience ratings before release using historical patterns.'
         },
         {
             icon: '📅',
             title: 'Optimal Release Date',
-            description: 'Identify the perfect release window by analyzing seasonal trends, competition, and genre patterns.'
+            description: 'Find the perfect release window by analyzing seasonal trends and historical performance.'
         },
         {
             icon: '🎭',
-            title: 'Cast and Crew Impact',
-            description: 'Understand how director, actors, and production company choices affect movie performance.'
+            title: 'Cast & Crew Impact',
+            description: 'Understand how director and actor choices affect a movie\'s commercial performance.'
+        },
+        {
+            icon: '🧠',
+            title: 'Explainable AI',
+            description: 'SHAP-based feature importance reveals exactly WHY a prediction was made — full transparency.'
+        },
+        {
+            icon: '🎛️',
+            title: 'What-If Simulator',
+            description: 'Tweak budget, genre, release month and instantly see how predictions change in real-time.'
+        },
+        {
+            icon: '🏆',
+            title: 'Competition Analyzer',
+            description: 'Real-time TMDB analysis of competing releases in your chosen release window.'
         },
         {
             icon: '🌍',
-            title: 'Dual Market Analysis',
-            description: 'Specialized models for both Hollywood and Indian cinema (Bollywood, Tollywood, Kollywood, Mollywood).'
+            title: 'Multi-Industry Support',
+            description: 'Specialized models for Hollywood, Bollywood, Tollywood, Kollywood, and Mollywood cinema.'
+        },
+        {
+            icon: '📈',
+            title: 'Trend Analytics',
+            description: 'Genre trends, seasonal patterns, and industry insights through interactive dashboards.'
         }
     ];
+
+    const row1 = capabilities.slice(0, 5);
+    const row2 = capabilities.slice(5);
 
     // Scroll Reveal Animation using Intersection Observer
     useEffect(() => {
@@ -167,18 +189,33 @@ const Home = () => {
                 </div>
 
 
-                <div className="capabilities-grid">
-                    {capabilities.map((cap, index) => (
-                        <div
-                            key={index}
-                            className="capability-card scroll-reveal fade-up"
-                            style={{ transitionDelay: `${index * 0.1}s` }}
-                        >
-                            <span className="capability-icon">{cap.icon}</span>
-                            <h3 className="capability-name">{cap.title}</h3>
-                            <p className="capability-desc">{cap.description}</p>
+                <div className="marquee-container scroll-reveal fade-up">
+
+                    {/* Row 1 - scrolls left */}
+                    <div className="marquee-row marquee-left">
+                        <div className="marquee-track">
+                            {[...row1, ...row1].map((cap, index) => (
+                                <div key={index} className="capability-card">
+                                    <span className="capability-icon">{cap.icon}</span>
+                                    <h3 className="capability-name">{cap.title}</h3>
+                                    <p className="capability-desc">{cap.description}</p>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
+
+                    {/* Row 2 - scrolls right (reverse) */}
+                    <div className="marquee-row marquee-right">
+                        <div className="marquee-track">
+                            {[...row2, ...row2].map((cap, index) => (
+                                <div key={index} className="capability-card">
+                                    <span className="capability-icon">{cap.icon}</span>
+                                    <h3 className="capability-name">{cap.title}</h3>
+                                    <p className="capability-desc">{cap.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Bottom Horizontal Line */}

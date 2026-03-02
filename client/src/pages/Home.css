@@ -5,27 +5,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Aboreto&family=Alumni+Sans+Pinstripe:ital@0;1&family=Bebas+Neue&family=Cal+Sans&family=Fredericka+the+Great&family=Notable&family=Oswald:wght@200..700&family=Patrick+Hand+SC&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Satisfy&family=Sekuya&family=Skranji:wght@400;700&family=Syne:wght@400..800&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 @font-face {
-  font-family: 'TT Firs Neue';
-  src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'TT Firs Neue';
-  src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'TT Firs Neue';
-  src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 :root {
@@ -339,30 +339,88 @@ body {
     z-index: 5;
 }
 
-/* Capabilities Grid - 3x2 layout */
-.capabilities-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
+/* ===== Marquee Capabilities ===== */
+.marquee-container {
     position: relative;
     z-index: 5;
+    overflow: hidden;
+    width: calc(100% + 120px);
+    margin-left: -60px;
+    margin-right: -60px;
+    padding: 10px 0;
 }
 
-/* Capability Card */
+/* Each marquee row */
+.marquee-row {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.marquee-row:last-child {
+    margin-bottom: 0;
+}
+
+/* The track holds cards in a line and animates */
+.marquee-track {
+    display: flex;
+    gap: 24px;
+    width: max-content;
+    padding: 8px 0;
+}
+
+/* Row 1 — scrolls left */
+.marquee-left .marquee-track {
+    animation: marquee-scroll 35s linear infinite;
+}
+
+/* Row 2 — scrolls right */
+.marquee-right .marquee-track {
+    animation: marquee-scroll-reverse 35s linear infinite;
+}
+
+/* Pause entire row on hover */
+.marquee-row:hover .marquee-track {
+    animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes marquee-scroll-reverse {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* ===== Capability Card (inside marquee) ===== */
 .capability-card {
     background: #111111;
     border: 1px solid #3d3d3d;
     border-radius: 16px;
     padding: 35px 30px;
+    min-width: 420px;
+    max-width: 420px;
+    flex-shrink: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
     overflow: hidden;
 }
 
-/* Hover Animation - Lift + Glow */
+/* Hover Animation - Lift + Glow (preserved from original) */
 .capability-card:hover {
     transform: translateY(-8px);
     border-color: #ff8300;
@@ -425,18 +483,26 @@ body {
 
 /* ===== Capabilities Responsive ===== */
 @media (max-width: 1024px) {
-    .capabilities-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .capability-card {
+        min-width: 280px;
+        max-width: 280px;
+        padding: 28px 24px;
     }
 
     .capabilities {
         padding: 60px 40px;
     }
+
+    .marquee-fade {
+        width: 60px;
+    }
 }
 
 @media (max-width: 768px) {
-    .capabilities-grid {
-        grid-template-columns: 1fr;
+    .capability-card {
+        min-width: 260px;
+        max-width: 260px;
+        padding: 24px 20px;
     }
 
     .capabilities {
