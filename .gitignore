@@ -25,6 +25,7 @@ env/
 # ML Model Files (large binary)
 # ========================
 *.pkl
+!ml-service/models/*.pkl
 *.h5
 *.pt
 *.pth
@@ -75,3 +76,10 @@ ehthumbs.db
 .cache/
 *.tmp
 *.bak
+
+# ========================
+# Internal Reports (not for repo)
+# ========================
+TODO.md
+ML_DETAILED_REPORT.md
+PROJECT_REPORT.md

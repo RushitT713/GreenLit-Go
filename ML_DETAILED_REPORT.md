@@ -1,45 +1,450 @@
-# GreenLit GO — Machine Learning: Complete Deep-Dive Report
+# GreenLit GO — Complete Project Deep-Dive Report
 
-> Everything you need to know about the ML pipeline — What, Why, When, Where, Who, How (W5H)
+> Everything you need to know about the entire project — What we built, How we built it, Why each decision was made, and How every piece works together.
+
+> **Updated: March 4, 2026**
 
 ---
 
 ## Table of Contents
 
-1. [What is the ML Problem?](#1-what-is-the-ml-problem)
-2. [Why Machine Learning?](#2-why-machine-learning)
-3. [Where Does ML Fit in the System?](#3-where-does-ml-fit-in-the-system)
-4. [How the ML Pipeline Works (Step-by-Step)](#4-how-the-ml-pipeline-works-step-by-step)
-5. [Data: The Foundation](#5-data-the-foundation)
+### Part A: Project Foundation
+1. [What is GreenLit GO?](#1-what-is-greenlit-go)
+2. [System Architecture](#2-system-architecture)
+3. [Technology Stack](#3-technology-stack)
+4. [Data Collection Pipeline](#4-data-collection-pipeline)
+
+### Part B: Machine Learning (The Brain)
+5. [ML Problem Definition](#5-ml-problem-definition)
 6. [Feature Engineering: The Secret Sauce](#6-feature-engineering-the-secret-sauce)
-7. [Model Selection: Which Algorithms and Why](#7-model-selection-which-algorithms-and-why)
+7. [Model Selection & Training](#7-model-selection--training)
 8. [Hyperparameter Tuning with Optuna](#8-hyperparameter-tuning-with-optuna)
-9. [Ensemble Learning: Combining Models](#9-ensemble-learning-combining-models)
-10. [Cross-Validation: Honest Evaluation](#10-cross-validation-honest-evaluation)
+9. [Ensemble Learning](#9-ensemble-learning)
+10. [Cross-Validation & Evaluation](#10-cross-validation--evaluation)
 11. [Model Performance & Results](#11-model-performance--results)
 12. [SHAP Explainability](#12-shap-explainability)
-13. [Prediction Flow: From Input to Output](#13-prediction-flow-from-input-to-output)
-14. [Model Serialization: Saving & Loading](#14-model-serialization-saving--loading)
-15. [Key Learnings & Insights](#15-key-learnings--insights)
+13. [Prediction Flow: Input to Output](#13-prediction-flow-input-to-output)
+14. [Model Serialization](#14-model-serialization)
+
+### Part C: Backend (The Backbone)
+15. [Node.js Server](#15-nodejs-server)
+16. [ML Service (Flask)](#16-ml-service-flask)
+
+### Part D: Frontend (The Face)
+17. [Design System & Aesthetics](#17-design-system--aesthetics)
+18. [Home Page](#18-home-page)
+19. [Released Movies Library](#19-released-movies-library)
+20. [Movie Detail Page](#20-movie-detail-page)
+21. [Insights Page (Data Analytics)](#21-insights-page-data-analytics)
+22. [Upcoming Dashboard (Prediction Engine)](#22-upcoming-dashboard-prediction-engine)
+23. [About Us Page](#23-about-us-page)
+24. [Reusable Components](#24-reusable-components)
+
+### Part E: Wrap-Up
+25. [Key Learnings & Insights](#25-key-learnings--insights)
+26. [How to Run the Project](#26-how-to-run-the-project)
 
 ---
 
-## 1. What is the ML Problem?
+# PART A: PROJECT FOUNDATION
 
-### Problem Statement
-We have two machine learning tasks:
+---
+
+## 1. What is GreenLit GO?
+
+### The Problem
+The film industry invests **billions** annually in movie production with extreme uncertainty about returns. Studios, producers, and filmmakers need data-driven insights to:
+- Predict potential box office revenue **before** production
+- Classify movies into success categories (Blockbuster → Flop)
+- Understand **which factors** drive movie success
+- Choose the **optimal release window**
+- Analyze **competition** in their release window
+
+### The Solution
+**GreenLit GO** is a full-stack web application that uses **Machine Learning** to solve this. It provides:
+
+| Feature | What It Does |
+|---------|-------------|
+| **Revenue Prediction** | Predicts worldwide box office gross using ensemble ML models |
+| **Success Classification** | Categorizes movies into 5 tiers: Blockbuster, Super Hit, Hit, Average, Flop |
+| **Explainable AI (SHAP)** | Shows exactly WHY a prediction was made |
+| **Released Movies Library** | Browse 1,600+ movies with filters, search, and analytics |
+| **Insights Dashboard** | 8+ interactive charts analyzing industry trends |
+| **Optimal Release Timing** | Recommends the best release month |
+| **Competition Analysis** | TMDB-powered analysis of competing movies |
+| **What-If Simulator** | Tweak inputs and see predictions change in real-time |
+
+### Project Scope
+
+| Aspect | Coverage |
+|--------|----------|
+| **Movies Analyzed** | 1,600+ films (2015-2025) |
+| **Industries** | Hollywood, Bollywood, Tollywood, Kollywood, Mollywood |
+| **Prediction Types** | Revenue, Success Category, ROI, Confidence |
+| **Revenue Model Accuracy** | R² = 0.9340 (93.4% variance explained) |
+| **Classification Accuracy** | 57.4% across 5 classes (2.85× better than random) |
+
+### Team
+
+| Member | Role |
+|--------|------|
+| **Rushit Trambadia** | ML & Backend Developer — Built the ML pipeline, trained models, engineered 40+ features |
+| **Vandit Doshi** | Frontend Developer — Built the React UI, interactive dashboards, premium visual design |
+| **Prof. Priyanka Mangi** | Project Guide |
+
+---
+
+## 2. System Architecture
+
+### High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         CLIENT (React + Vite)                           │
+│   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │
+│   │   Home   │ │ Released │ │ Insights │ │ Upcoming │ │  About   │   │
+│   │   Page   │ │  Movies  │ │   Page   │ │Dashboard │ │   Us     │   │
+│   └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘   │
+│              Axios HTTP Client  ←→  React Router                       │
+└──────────────────────────────┬─────────────────────────────────────────┘
+                               │ HTTP/REST (port 5173 → 5000)
+┌──────────────────────────────▼─────────────────────────────────────────┐
+│                    NODE.JS SERVER (Express, port 5000)                  │
+│   ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────────────┐ │
+│   │  /movies   │ │  /talents  │ │  /trends   │ │ /predictions       │ │
+│   │    API     │ │    API     │ │   API      │ │ (proxy → ML)       │ │
+│   └────────────┘ └────────────┘ └────────────┘ └────────────────────┘ │
+└──────────────┬─────────────────────────────────────────┬──────────────┘
+               │                                         │
+               ▼                                         ▼
+┌──────────────────────┐              ┌─────────────────────────────────┐
+│   MONGODB DATABASE   │              │    ML SERVICE (Flask, port 5001) │
+│  ┌────────────────┐  │              │  ┌───────────┐ ┌─────────────┐  │
+│  │    Movies      │  │              │  │ Predictor │ │   Trainer   │  │
+│  │  Collection    │  │              │  │  Module   │ │   Module    │  │
+│  │ (1,600+ docs)  │  │              │  └───────────┘ └─────────────┘  │
+│  └────────────────┘  │              │  ┌───────────┐ ┌─────────────┐  │
+│                      │              │  │ Revenue   │ │ Classifier  │  │
+│                      │              │  │ Ensemble  │ │  Ensemble   │  │
+│                      │              │  │ (RF+XGB   │ │ (GB+XGB    │  │
+│                      │              │  │  +LGBM)   │ │  +LGBM)    │  │
+│                      │              │  └───────────┘ └─────────────┘  │
+└──────────────────────┘              └─────────────────────────────────┘
+```
+
+### Directory Structure
+
+```
+ml-web-app-project/
+├── client/                          # React Frontend (Vite)
+│   ├── src/
+│   │   ├── assets/                  # Images (team photos, react.svg)
+│   │   ├── components/
+│   │   │   ├── common/              # Shared UI components
+│   │   │   │   ├── Navbar.jsx/css   # Top navigation bar
+│   │   │   │   ├── Footer.jsx/css   # Page footer
+│   │   │   │   ├── FilterFab.jsx/css # Floating filter button
+│   │   │   │   └── TalentSearch.jsx/css # Director/Cast search
+│   │   │   └── movies/
+│   │   │       └── MovieCard.jsx/css # Movie card component
+│   │   ├── pages/                   # Main page components
+│   │   │   ├── Home.jsx/css         # Landing page (marquee capabilities)
+│   │   │   ├── ReleasedMovies.jsx/css # Movie library
+│   │   │   ├── MovieDetail.jsx/css  # Individual movie page
+│   │   │   ├── Insights.jsx/css     # Analytics dashboard
+│   │   │   ├── UpcomingDashboard.jsx/css # Prediction engine (86KB!)
+│   │   │   └── About.jsx/css        # About Us page
+│   │   ├── services/
+│   │   │   └── api.js               # Axios API service layer
+│   │   ├── App.jsx                  # Root component + routing
+│   │   └── index.css                # Global styles + fonts
+│   └── index.html
+│
+├── server/                          # Node.js Backend (Express)
+│   ├── src/
+│   │   ├── routes/
+│   │   │   ├── movies.js            # CRUD for movies (8KB)
+│   │   │   ├── talents.js           # Director/Cast search (9KB)
+│   │   │   ├── predictions.js       # ML proxy endpoints (10KB)
+│   │   │   └── trends.js            # Analytics data endpoints (11KB)
+│   │   ├── models/
+│   │   │   └── Movie.js             # Mongoose schema
+│   │   ├── config/
+│   │   │   └── db.js                # MongoDB connection
+│   │   └── app.js                   # Express server entry
+│   └── .env                         # MONGODB_URI, ML_SERVICE_URL
+│
+├── ml-service/                      # Python ML Service (Flask)
+│   ├── app/
+│   │   ├── __init__.py              # Flask app factory
+│   │   ├── routes.py                # API endpoints (/predict, /explain, etc.)
+│   │   ├── predictor.py             # Loads models & makes predictions (31KB)
+│   │   ├── trainer.py               # Trains models from MongoDB data (35KB)
+│   │   └── models/                  # Saved model files (.pkl, .json)
+│   │       ├── revenue_model.pkl    # Trained revenue ensemble (~24MB)
+│   │       ├── classifier_model.pkl # Trained classification ensemble (~8MB)
+│   │       ├── scaler.pkl           # StandardScaler
+│   │       ├── label_encoder.pkl    # Category ↔ number mapping
+│   │       ├── feature_columns.pkl  # 34 feature column names
+│   │       ├── best_params.json     # Optuna-tuned hyperparameters
+│   │       └── training_results.json # Model metrics
+│   └── requirements.txt
+│
+├── data-collection/                 # Data Pipeline
+│   ├── collectors/
+│   │   ├── tmdb_collector.py        # The Movie Database API
+│   │   ├── omdb_collector.py        # Open Movie Database API
+│   │   ├── youtube_collector.py     # YouTube Data API v3
+│   │   └── bom_crawler.py          # Box Office Mojo scraper
+│   └── scripts/                     # Data collection scripts
+│
+├── ML_DETAILED_REPORT.md            # THIS file
+├── PROJECT_REPORT.md                # Overview report
+└── README.md                        # Quick start guide
+```
+
+### Three Separate Processes
+
+| Process | Port | Technology | What It Does |
+|---------|------|------------|-------------|
+| **React Client** | 5173 | Vite + React | Serves the user interface |
+| **Node.js Server** | 5000 | Express | REST API, connects to MongoDB, proxies to ML |
+| **ML Service** | 5001 | Flask | Loads trained models, serves predictions |
+
+---
+
+## 3. Technology Stack
+
+### 3.1 Frontend
+
+| Technology | Purpose | Why We Chose It |
+|------------|---------|----------------|
+| **React 18** | UI Framework | Component-based, massive ecosystem |
+| **Vite** | Build Tool | 10× faster than Create React App |
+| **React Router 6** | Navigation | Client-side routing between pages |
+| **Axios** | HTTP Client | Promise-based, clean API calls |
+| **ApexCharts** | Data Visualization | Interactive charts for Insights page |
+| **CSS (vanilla)** | Styling | Full control, no framework lock-in |
+
+### 3.2 Backend
+
+| Technology | Purpose | Why We Chose It |
+|------------|---------|----------------|
+| **Node.js 18** | Server Runtime | JavaScript everywhere, async I/O |
+| **Express 4** | Web Framework | Minimal, flexible, well-documented |
+| **MongoDB 7** | Database | Schema-flexible for varied movie data |
+| **Mongoose 8** | ODM | Schema validation + query builder |
+| **CORS** | Cross-Origin | Allow React (5173) → Express (5000) |
+| **Axios** | HTTP Client | Proxy requests to ML service |
+
+### 3.3 Machine Learning
+
+| Technology | Purpose | Why We Chose It |
+|------------|---------|----------------|
+| **Python 3.11** | ML Runtime | Industry standard for ML |
+| **Flask 3** | API Server | Lightweight, easy to integrate |
+| **Scikit-learn** | ML Models | RandomForest, GradientBoosting, StandardScaler |
+| **XGBoost** | Gradient Boosting | #1 in ML competitions |
+| **LightGBM** | Gradient Boosting | Fastest implementation, leaf-wise growth |
+| **Optuna** | Hyperparameter Tuning | Automated, intelligent search |
+| **SHAP** | Explainability | Game-theory based feature importance |
+| **Pandas** | Data Processing | DataFrame operations |
+| **NumPy** | Numerical Computing | Array math, log transforms |
+
+### 3.4 Data Collection
+
+| Technology | Purpose | Data Collected |
+|------------|---------|---------------|
+| **TMDB API** | Movie metadata | Title, budget, revenue, cast, crew, genres |
+| **OMDB API** | External ratings | IMDb rating, Metascore, Rotten Tomatoes |
+| **YouTube API v3** | Pre-release buzz | Trailer views, likes, comments |
+| **BeautifulSoup** | Web scraping | Box Office Mojo opening weekend data |
+
+### 3.5 Design & Fonts
+
+| Element | Value |
+|---------|-------|
+| **Primary Font** | TT Firs Neue |
+| **Secondary Font** | Syne |
+| **Primary Color** | `#ff8300` (Orange) |
+| **Background** | `#000000` (Black) |
+| **Surface Color** | `#111111` / `#1a1a1a` |
+| **Text Color** | `#ffffff` / `#999999` |
+
+---
+
+## 4. Data Collection Pipeline
+
+### 4.1 Data Sources & Coverage
+
+| Source | Data Collected | Movies Enriched |
+|--------|----------------|----------------|
+| **TMDB API** | Title, budget, revenue, cast, crew, genres, release date, poster, backdrop | 1,600+ |
+| **OMDB API** | IMDb rating, Metascore, Rotten Tomatoes scores, awards | ~1,000 |
+| **YouTube API** | Official trailer views, likes, comments | ~285 |
+| **Box Office Mojo** | Opening weekend gross, distributor | ~1,078 |
+| **Indian Cinema** | Bollywood, Tollywood, Kollywood, Mollywood data | ~460 |
+
+### 4.2 Data Collection Architecture
+
+```
+                        ┌─────────────────┐
+                        │   TMDB API      │ ─── Primary source
+                        │  (tmdbId, title,│     1,600+ movies
+                        │   budget, etc.) │
+                        └────────┬────────┘
+                                 │
+                    ┌────────────┼────────────┬────────────┐
+                    ▼            ▼            ▼            ▼
+             ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+             │ OMDB API │ │ YouTube  │ │ Box Off. │ │  Indian  │
+             │ (IMDb,   │ │ API v3   │ │  Mojo    │ │  Cinema  │
+             │Metascore)│ │(trailer) │ │(opening) │ │  Data    │
+             └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘
+                  │            │            │            │
+                  └────────────┴────────┬───┴────────────┘
+                                        ▼
+                              ┌──────────────────┐
+                              │   MongoDB Atlas   │
+                              │  movies collection│
+                              │   (1,600+ docs)   │
+                              └──────────────────┘
+```
+
+### 4.3 MongoDB Document Schema
+
+```javascript
+{
+  _id: ObjectId,
+  tmdbId: Number,              // TMDB unique identifier
+  title: String,               // "Avengers: Endgame"
+  originalTitle: String,
+  year: Number,                // 2019
+  releaseDate: Date,           // 2019-04-24
+
+  // Financial Data
+  budget: Number,              // 356000000
+  revenue: Number,             // 2797501328
+
+  // Ratings & Metrics
+  voteAverage: Number,         // 8.3 (TMDB 0-10)
+  voteCount: Number,           // 28543
+  popularity: Number,          // 165.3
+
+  // Content
+  genres: [String],            // ["Action", "Adventure", "Drama"]
+  overview: String,            // Plot synopsis
+  runtime: Number,             // 181 minutes
+  posterPath: String,          // TMDB poster URL
+  backdropPath: String,        // TMDB backdrop URL
+  isSequel: Boolean,           // true
+
+  // Credits
+  director: {
+    name: String,              // "Anthony Russo"
+    popularity: Number,        // 45.2
+    knownFor: [String]
+  },
+  cast: [{
+    name: String,              // "Robert Downey Jr."
+    character: String,         // "Tony Stark / Iron Man"
+    popularity: Number,        // 92.1
+    profilePath: String        // Photo URL
+  }],
+
+  // Industry
+  industry: String,            // "hollywood" | "bollywood" | "tollywood" | etc.
+
+  // Enriched: OMDB
+  imdbId: String,
+  imdbRating: Number,          // 8.4
+  metascore: Number,           // 78
+  rottenTomatoesScore: Number, // 94
+  rottenTomatoesAudienceScore: Number,
+
+  // Enriched: YouTube
+  socialMetrics: {
+    trailerViews: Number,      // 200000000
+    trailerLikes: Number,      // 5000000
+    trailerComments: Number    // 150000
+  },
+
+  // Enriched: Box Office Mojo
+  releaseStrategy: {
+    openingWeekendRevenue: Number,  // 357115007
+    distributor: String             // "Walt Disney"
+  },
+
+  // Production
+  productionCompanies: [{ name: String }],
+
+  // ML Predictions (stored after batch-predict)
+  predictions: {
+    successCategory: String,   // "Blockbuster"
+    predictedRevenue: Number,  // 2500000000
+    predictedROI: Number,      // 602
+    confidence: Number         // 78
+  },
+
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### 4.4 How Each Collector Works
+
+**TMDB Collector** (`tmdb_collector.py`):
+```python
+# Fetches movies by industry, year range, and page
+# Uses TMDB's /discover/movie endpoint with filters
+# Enriches with /movie/{id}/credits for cast & crew
+# Stores in MongoDB with industry tag
+```
+
+**OMDB Collector** (`omdb_collector.py`):
+```python
+# Takes IMDb IDs from TMDB data
+# Calls OMDB API for each movie
+# Extracts: IMDb rating, Metascore, Rotten Tomatoes
+# Updates existing MongoDB documents
+```
+
+**YouTube Collector** (`youtube_collector.py`):
+```python
+# Searches YouTube for "{movie_title} official trailer"
+# Uses YouTube Data API v3 to get video statistics
+# Extracts: viewCount, likeCount, commentCount
+# Updates MongoDB with socialMetrics field
+```
+
+**Box Office Mojo Crawler** (`bom_crawler.py`):
+```python
+# Scrapes Box Office Mojo pages using BeautifulSoup
+# Extracts opening weekend gross and distributor
+# Updates MongoDB with releaseStrategy field
+```
+
+---
+
+# PART B: MACHINE LEARNING (THE BRAIN)
+
+---
+
+## 5. ML Problem Definition
+
+### Two ML Tasks
 
 **Task 1: Revenue Prediction (Regression)**
-- **Input:** Movie attributes (budget, genre, cast, director, etc.)
-- **Output:** Predicted worldwide box office revenue (a number in dollars)
+- **Input:** 34 movie features (budget, genre, cast, director, etc.)
+- **Output:** Predicted worldwide box office revenue ($)
 - **Type:** Supervised Regression
-- **Question it answers:** *"How much money will this movie make?"*
+- **Question:** *"How much money will this movie make?"*
 
-**Task 2: Success Classification (Multi-class Classification)**
-- **Input:** Same movie attributes
-- **Output:** One of 5 categories: Blockbuster, Super Hit, Hit, Average, Flop
+**Task 2: Success Classification (Multi-class)**
+- **Input:** Same 34 features
+- **Output:** One of 5 categories
 - **Type:** Supervised Multi-class Classification
-- **Question it answers:** *"Will this movie be a hit or a flop?"*
+- **Question:** *"Will this movie be a hit or a flop?"*
 
 ### Success Categories (Based on ROI)
 
@@ -47,13 +452,12 @@ ROI = Return on Investment = `(Revenue - Budget) / Budget × 100`
 
 | Category | ROI Threshold | Real-World Example |
 |----------|---------------|-------------------|
-| **Blockbuster** | ROI ≥ 400% | Avatar, Avengers ($200M budget → $2B+ revenue) |
-| **Super Hit** | ROI ≥ 200% | John Wick ($20M budget → $86M revenue) |
-| **Hit** | ROI ≥ 100% | A movie that doubles its budget |
+| **Blockbuster** | ROI ≥ 400% | Avatar ($237M → $2.9B) |
+| **Super Hit** | ROI ≥ 200% | John Wick ($20M → $86M) |
+| **Hit** | ROI ≥ 100% | Movie doubles its budget |
 | **Average** | ROI ≥ 0% | Breaks even or small profit |
-| **Flop** | ROI < 0% | Lost money (budget > revenue) |
+| **Flop** | ROI < 0% | Lost money |
 
-**Code that defines this** (`trainer.py`):
 ```python
 SUCCESS_CATEGORIES = {
     'Blockbuster': 400,  # ROI >= 400%
@@ -64,260 +468,66 @@ SUCCESS_CATEGORIES = {
 }
 ```
 
----
-
-## 2. Why Machine Learning?
-
-### Why Not Simple Rules?
-
-You might think: *"Just check if budget is high and cast is popular, then it's a hit."*
-
-**Problems with simple rules:**
-1. Budget alone doesn't guarantee success (many expensive movies flopped)
-2. There are 34 features interacting in complex ways
-3. Patterns change across industries (Bollywood vs Hollywood)
-4. Non-linear relationships exist (e.g., very high budgets sometimes indicate risky projects)
-
-### Why ML Works Here
+### Why Machine Learning (Not Simple Rules)?
 
 | Challenge | How ML Solves It |
 |-----------|-----------------|
-| Too many factors | ML considers 34 features simultaneously |
+| Too many factors (34 features) | ML considers all simultaneously |
 | Complex interactions | Tree-based models capture non-linear patterns |
-| Industry differences | One-hot encoded industry features let the model learn per-industry patterns |
-| Pre-release signals | YouTube trailer data gives early indicators |
-
----
-
-## 3. Where Does ML Fit in the System?
-
-### Architecture Position
-
-```
-User fills prediction form in React
-         │
-         ▼
-React → Node.js API (port 5000) → proxies to → ML Service (port 5001)
-                                                      │
-                                                      ▼
-                                              ┌──────────────┐
-                                              │ predictor.py │
-                                              │   loads:     │
-                                              │  - models    │
-                                              │  - scaler    │
-                                              │  - encoder   │
-                                              └──────┬───────┘
-                                                     │
-                                                     ▼
-                                              ┌──────────────┐
-                                              │  .pkl files  │
-                                              │ (serialized  │
-                                              │   models)    │
-                                              └──────────────┘
-```
-
-### File Structure
-
-```
-ml-service/
-├── app/
-│   ├── __init__.py        ← Flask app factory (creates the web server)
-│   ├── routes.py          ← API endpoints (/predict, /explain, etc.)
-│   ├── predictor.py       ← Loads models & makes predictions (INFERENCE)
-│   ├── trainer.py         ← Trains models from data (TRAINING)
-│   └── models/            ← Saved model files
-│       ├── revenue_model.pkl       ← Trained revenue ensemble model
-│       ├── classifier_model.pkl    ← Trained classification ensemble model
-│       ├── scaler.pkl              ← StandardScaler (fitted on training data)
-│       ├── label_encoder.pkl       ← Maps category names ↔ numbers
-│       ├── feature_columns.pkl     ← List of 34 feature column names
-│       ├── best_params.json        ← Optuna-tuned hyperparameters
-│       └── training_results.json   ← Model performance metrics
-└── requirements.txt
-```
-
-### Two Separate Processes
-
-| Process | When | What |
-|---------|------|------|
-| **Training** (`trainer.py`) | Run manually, occasionally | Reads MongoDB → trains models → saves .pkl files |
-| **Inference** (`predictor.py`) | Always running (Flask server) | Loads .pkl files → receives API requests → returns predictions |
-
----
-
-## 4. How the ML Pipeline Works (Step-by-Step)
-
-### Training Pipeline (What happens when you run `python -c "from app.trainer import MovieModelTrainer; t = MovieModelTrainer(); t.train()"`)
-
-```
-Step 1: LOAD DATA
-    ↓  Connect to MongoDB, fetch all 1,652 movies
-    ↓  Convert to Pandas DataFrame
-    ↓
-Step 2: FILTER VALID DATA
-    ↓  Keep only movies with budget > 0 OR revenue > 0
-    ↓  Result: ~1,652 valid movies for training
-    ↓
-Step 3: FEATURE ENGINEERING
-    ↓  Extract 34 numerical features from raw movie data
-    ↓  (Explained in detail in Section 6)
-    ↓
-Step 4: CALCULATE TARGETS
-    ↓  Revenue target: log(revenue + 1)  ← log transformation!
-    ↓  Category target: Calculate ROI → assign category
-    ↓
-Step 5: SPLIT DATA
-    ↓  80% Training, 20% Testing
-    ↓  Classification uses STRATIFIED split
-    ↓
-Step 6: SCALE FEATURES
-    ↓  StandardScaler: transforms each feature to mean=0, std=1
-    ↓
-Step 7: TUNE HYPERPARAMETERS (Optuna)
-    ↓  50 trials per model × 5 models = 250 total experiments
-    ↓
-Step 8: TRAIN INDIVIDUAL MODELS
-    ↓  RandomForest, XGBoost, LightGBM for each task
-    ↓
-Step 9: CREATE ENSEMBLE
-    ↓  Combine all 3 models using weighted voting
-    ↓
-Step 10: EVALUATE
-    ↓  R² score, MAE for regression
-    ↓  Accuracy, F1 for classification
-    ↓  5-Fold Cross-validation for both
-    ↓
-Step 11: SAVE
-    ↓  Pickle all models, scaler, encoder, feature list
-    ↓  Save params and results as JSON
-    Done!
-```
-
----
-
-## 5. Data: The Foundation
-
-### What Data Do We Have?
-
-Each movie in MongoDB has these fields that feed the ML:
-
-| Data Point | Source | Example |
-|------------|--------|---------|
-| Budget | TMDB API | $200,000,000 |
-| Revenue | TMDB API | $2,799,439,100 |
-| Runtime | TMDB API | 162 minutes |
-| Vote Average | TMDB API | 7.8 |
-| Vote Count | TMDB API | 28,543 |
-| Popularity | TMDB API | 165.3 |
-| Release Date | TMDB API | 2019-04-24 |
-| Genres | TMDB API | ["Action", "Adventure", "Sci-Fi"] |
-| Director | TMDB API | {name: "Russo Brothers", popularity: 45.2} |
-| Cast | TMDB API | [{name: "RDJ", popularity: 92.1}, ...] |
-| Is Sequel | TMDB API | true |
-| Industry | Custom | "hollywood" |
-| IMDb Rating | OMDB API | 8.4 |
-| Metascore | OMDB API | 78 |
-| Opening Gross | Box Office Mojo | $357,115,007 |
-| Trailer Views | YouTube API | 200,000,000 |
-| Trailer Likes | YouTube API | 5,000,000 |
-| Trailer Comments | YouTube API | 150,000 |
-
-### Why Log-Transform Revenue?
-
-Revenue has an extremely **skewed distribution**:
-
-```
-Most movies:    $1M - $100M     (many movies here)
-Some movies:    $100M - $500M   (fewer)
-Few movies:     $500M - $2.8B   (very few outliers like Avatar)
-```
-
-Without log transform, the model focuses on predicting Avatar-level outliers and ignores small movies.
-
-**Log transformation** (`log(revenue + 1)`) compresses the scale:
-
-```
-$1M        → log(1,000,000)     = 13.8
-$100M      → log(100,000,000)   = 18.4
-$1B        → log(1,000,000,000) = 20.7
-$2.8B      → log(2,800,000,000) = 21.8
-```
-
-Now the range is 13.8 to 21.8 instead of $1M to $2.8B — much easier for the model!
-
-**Code:**
-```python
-# During training
-log_revenue = np.log1p(revenue)  # log(x + 1) to handle 0 values
-
-# During prediction (reversing the transform)
-revenue_pred = np.expm1(log_revenue_pred)  # e^x - 1
-```
+| Industry differences | One-hot encoded industry features learn per-industry patterns |
+| Pre-release signals | YouTube trailer data provides early indicators |
+| Changing trends | Model learns from historical patterns |
 
 ---
 
 ## 6. Feature Engineering: The Secret Sauce
 
-### What is Feature Engineering?
-
-**Feature engineering** is the process of transforming raw data into numerical values that ML models can understand. Models only understand numbers — they can't read "Action" or "Christopher Nolan".
+**Feature engineering** = transforming raw movie data into numerical values ML models can understand. Models only understand numbers.
 
 ### Our 34 Features (Grouped)
 
-#### Group 1: Basic Numeric Features (6 features)
-These are directly taken from the data:
+#### Group 1: Basic Numeric (6 features)
 
 | Feature | What It Is | Why It Matters |
 |---------|-----------|----------------|
-| `budget` | Production budget in USD | #1 predictor — big-budget films tend to earn more |
-| `runtime` | Movie length in minutes | Very long or short movies may perform differently |
-| `vote_average` | TMDB user rating (0-10) | Higher-rated movies tend to earn more |
-| `vote_count` | How many users rated | Proxy for popularity/awareness |
-| `popularity` | TMDB's popularity score | Composite signal of public interest |
-| `year` | Release year | Trends change over time (inflation, streaming) |
+| `budget` | Production budget (USD) | #1 predictor of revenue |
+| `runtime` | Movie length (minutes) | Optimal length affects performance |
+| `vote_average` | TMDB rating (0-10) | Quality signal |
+| `vote_count` | Number of ratings | Proxy for popularity |
+| `popularity` | TMDB popularity score | Composite interest signal |
+| `year` | Release year | Inflation, streaming trends |
 
-**Code:**
 ```python
-features['budget'] = movies_df['budget'].fillna(0)       # If missing, assume 0
-features['runtime'] = movies_df['runtime'].fillna(120)    # If missing, assume 2 hours
-features['vote_average'] = movies_df['voteAverage'].fillna(6.0)  # Default to average
+features['budget'] = movies_df['budget'].fillna(0)
+features['runtime'] = movies_df['runtime'].fillna(120)    # Default: 2 hours
+features['vote_average'] = movies_df['voteAverage'].fillna(6.0)  # Default: average
 ```
 
-#### Group 2: Temporal/Seasonal Features (3 features)
-When a movie releases matters:
+#### Group 2: Temporal/Seasonal (3 features)
 
-| Feature | How It's Calculated | Why |
-|---------|-------------------|-----|
-| `release_month` | Extracted from release date (1-12) | Summer blockbusters vs Oscar-season dramas |
-| `is_summer_release` | 1 if month in [5,6,7,8], else 0 | Summer = action/family movie season |
-| `is_holiday_release` | 1 if month in [11,12], else 0 | Holidays = family viewing + awards push |
+| Feature | Calculation | Why |
+|---------|------------|-----|
+| `release_month` | From release date (1-12) | Summer blockbusters vs Oscar dramas |
+| `is_summer_release` | 1 if month in [5,6,7,8] | Summer = action/family season |
+| `is_holiday_release` | 1 if month in [11,12] | Holiday = family + awards push |
 
-**Code:**
 ```python
 features['is_summer_release'] = features['release_month'].apply(
     lambda x: 1 if x in [5, 6, 7, 8] else 0
 )
 ```
 
-> **Concept: Binary Encoding** — Instead of month as a number (1-12), we create yes/no features. The model learns "summer release = +X revenue" more easily than "month 7 is like month 6 but different from month 12."
-
-#### Group 3: Genre Features — One-Hot Encoding (9 features)
+#### Group 3: Genre (One-Hot Encoded, 9 features)
 
 | Feature | Value |
 |---------|-------|
-| `genre_action` | 1 if genres contain "Action", else 0 |
-| `genre_comedy` | 1 if genres contain "Comedy", else 0 |
-| `genre_drama` | 1 if genres contain "Drama", else 0 |
-| `genre_horror` | 1 if genres contain "Horror", else 0 |
-| `genre_thriller` | 1 if genres contain "Thriller", else 0 |
-| `genre_science_fiction` | 1 if genres contain "Sci-Fi", else 0 |
-| `genre_animation` | 1 if genres contain "Animation", else 0 |
-| `genre_romance` | 1 if genres contain "Romance", else 0 |
-| `genre_adventure` | 1 if genres contain "Adventure", else 0 |
+| `genre_action` | 1 if Action, else 0 |
+| `genre_comedy` | 1 if Comedy, else 0 |
+| `genre_drama` | 1 if Drama, else 0 |
+| `genre_horror`, `genre_thriller`, `genre_science_fiction`, `genre_animation`, `genre_romance`, `genre_adventure` | Same pattern |
 
-> **Concept: One-Hot Encoding** — We can't give a model the word "Action". Instead, we create a separate column for each genre and put 1 or 0. A movie can have multiple 1s (e.g., Action-Adventure).
+> **One-Hot Encoding:** We can't give a model the word "Action." Instead, we create a separate binary column for each genre. A movie can have multiple 1s (e.g., Action-Adventure).
 
-**Code:**
 ```python
 popular_genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Thriller',
                   'Science Fiction', 'Animation', 'Romance', 'Adventure']
@@ -328,30 +538,28 @@ for genre in popular_genres:
     )
 ```
 
-#### Group 4: Industry Features — One-Hot Encoding (~4 features)
-| Feature | Value |
-|---------|-------|
-| `industry_hollywood` | 1 if Hollywood, else 0 |
-| `industry_bollywood` | 1 if Bollywood, else 0 |
-| `industry_tollywood` | 1 if Tollywood, else 0 |
-| `industry_kollywood` | 1 if Kollywood, else 0 |
+#### Group 4: Industry (One-Hot Encoded, ~4 features)
 
-**Code:**
+| Feature | Meaning |
+|---------|---------|
+| `industry_hollywood` | 1 if Hollywood |
+| `industry_bollywood` | 1 if Bollywood |
+| `industry_tollywood` | 1 if Tollywood |
+| `industry_kollywood` | 1 if Kollywood |
+
 ```python
 industry_dummies = pd.get_dummies(features['industry'], prefix='industry')
 features = pd.concat([features, industry_dummies], axis=1)
 ```
 
-> `pd.get_dummies()` is Pandas' built-in one-hot encoder. It automatically creates columns like `industry_hollywood`, `industry_bollywood`, etc.
+#### Group 5: Talent (3 features)
 
-#### Group 5: Talent Features (3 features)
 | Feature | How Calculated | Why |
 |---------|---------------|-----|
-| `director_popularity` | TMDB popularity score of director | Well-known directors draw audiences |
-| `cast_popularity` | Average TMDB popularity of top cast | Star power sells tickets |
-| `is_sequel` | 1 if sequel/franchise, else 0 | Sequels have built-in audience |
+| `director_popularity` | TMDB popularity score | Famous directors draw audiences |
+| `cast_popularity` | Average top cast TMDB popularity | Star power sells tickets |
+| `is_sequel` | 1 if sequel/franchise | Built-in audience |
 
-**Code:**
 ```python
 def get_cast_popularity(cast):
     if isinstance(cast, list) and len(cast) > 0:
@@ -363,137 +571,127 @@ features['cast_popularity'] = movies_df['cast'].apply(get_cast_popularity)
 ```
 
 #### Group 6: Pre-Release Buzz — YouTube (5 features)
+
 | Feature | What | Why |
 |---------|------|-----|
-| `trailer_views` | Raw trailer view count | Direct measure of anticipation |
-| `trailer_likes` | Number of likes | Positive sentiment |
-| `trailer_comments` | Number of comments | Engagement level |
-| `trailer_views_log` | `log(views + 1)` | Compressed scale (same log trick as revenue) |
-| `trailer_engagement_ratio` | `(likes + comments) / views × 100` | Quality of engagement, not just volume |
+| `trailer_views` | Raw view count | Direct anticipation measure |
+| `trailer_likes` | Like count | Positive sentiment |
+| `trailer_comments` | Comment count | Engagement level |
+| `trailer_views_log` | `log(views + 1)` | Compressed scale |
+| `trailer_engagement_ratio` | `(likes + comments) / views × 100` | Quality of engagement |
 
-> **Why engagement ratio?** A trailer with 10M views and 1M likes (10% engagement) signals more excitement than one with 100M views and 1M likes (1% engagement).
+> **Why engagement ratio?** 10M views + 1M likes (10% engagement) > 100M views + 1M likes (1% engagement)
 
 #### Group 7: External Ratings (3 features)
+
 | Feature | Source | Why |
 |---------|--------|-----|
 | `imdb_rating` | OMDB API | Professional + audience consensus |
 | `metascore` | OMDB API | Critical review score |
-| `opening_gross` | Box Office Mojo | First-weekend sales predict total |
+| `opening_gross` | Box Office Mojo | First-weekend predicts total |
 
-### Handling Missing Values
+### Why Log-Transform Revenue?
 
-Not every movie has all 34 features. Our approach:
+Revenue distribution is extremely **skewed** — most movies earn $1M-$100M, but outliers like Avatar earn $2.8B. Without log transform, the model focuses on outliers.
 
-```python
-features['budget'] = movies_df['budget'].fillna(0)        # No budget info → 0
-features['runtime'] = movies_df['runtime'].fillna(120)     # Unknown → assume 2hrs
-features['vote_average'] = movies_df['voteAverage'].fillna(6.0)  # Unknown → average
-features['trailer_views'] = 0  # If no YouTube data, assume 0 views
+```
+$1M        → log(1,000,000)     = 13.8
+$100M      → log(100,000,000)   = 18.4
+$1B        → log(1,000,000,000) = 20.7
+$2.8B      → log(2,800,000,000) = 21.8
 ```
 
-> **Why these defaults?** We use the *mean/median/zero* strategy. Using 0 is safe because tree-based models (RandomForest, XGBoost) can learn that "0 means missing" and handle it accordingly.
+Now the range is 13.8–21.8 instead of $1M–$2.8B — much easier for the model!
+
+```python
+# Training: compress
+log_revenue = np.log1p(revenue)  # log(x + 1) to handle $0
+
+# Prediction: decompress
+revenue_pred = np.expm1(log_revenue_pred)  # e^x - 1
+```
 
 ---
 
-## 7. Model Selection: Which Algorithms and Why
+## 7. Model Selection & Training
 
-### Algorithm 1: RandomForestRegressor
+### Algorithm 1: RandomForest
 
-**What it is:** An ensemble of hundreds of decision trees, each trained on a random subset of data and features. Final prediction = average of all trees.
+**What:** Ensemble of hundreds of decision trees, each trained on random data/feature subsets. Final = average of all trees.
 
-**Why we use it:**
-- Resistant to overfitting
-- Handles non-linear relationships
-- Provides feature importance
-- Works well "out of the box"
+**Why:** Resistant to overfitting, handles non-linear relationships, provides feature importance.
 
-**How it works (simplified):**
 ```
 Tree 1: IF budget > $100M AND is_sequel=1 → predict $500M
 Tree 2: IF cast_popularity > 50 AND genre_action=1 → predict $400M
 Tree 3: IF trailer_views > 10M AND is_summer=1 → predict $600M
-...
-Final prediction = average(Tree 1, Tree 2, Tree 3, ...) = $500M
+Final = average(500, 400, 600) = $500M
 ```
 
 **Our tuned hyperparameters (found by Optuna):**
 ```python
 RandomForestRegressor(
-    n_estimators=200,      # 200 trees in the forest
-    max_depth=14,          # Each tree can be up to 14 levels deep
-    min_samples_split=2,   # Minimum 2 samples to split a node
-    min_samples_leaf=1,    # Minimum 1 sample in a leaf
-    max_features=None,     # Consider ALL features for each split
-    random_state=42        # Reproducibility seed
+    n_estimators=200,      # 200 trees
+    max_depth=14,          # Max 14 levels deep
+    min_samples_split=2,   # Min 2 samples to split
+    min_samples_leaf=1,    # Min 1 sample per leaf
+    max_features=None,     # Consider ALL features
+    random_state=42
 )
 ```
 
-### Algorithm 2: XGBoostRegressor (eXtreme Gradient Boosting)
+### Algorithm 2: XGBoost (eXtreme Gradient Boosting)
 
-**What it is:** Builds trees one at a time, where each new tree tries to fix the errors of the previous trees. This is "boosting" — models learn from mistakes.
+**What:** Builds trees sequentially — each new tree fixes errors of previous trees. "Boosting" = learning from mistakes.
 
-**Why we use it:**
-- Often #1 in ML competitions
-- Built-in regularization prevents overfitting
-- Fast training
-- Handles missing values natively
+**Why:** Often #1 in ML competitions, built-in regularization, handles missing values.
 
-**How it works (simplified):**
 ```
-Tree 1: predict $300M (error: actual was $500M, so error = -$200M)
-Tree 2: try to predict the -$200M error → predicts -$150M
-Tree 3: try to predict remaining -$50M error → predicts -$40M
-Final: $300M + $150M + $40M = $490M (much closer to $500M!)
+Tree 1: predict $300M (error: actual was $500M, error = -$200M)
+Tree 2: try to predict -$200M error → -$150M
+Tree 3: predict remaining -$50M → -$40M
+Final: $300M + $150M + $40M = $490M (much closer!)
 ```
 
 **Our tuned hyperparameters:**
 ```python
 XGBRegressor(
-    n_estimators=450,            # 450 sequential trees
-    max_depth=7,                 # Shallower trees (prevent overfitting)
-    learning_rate=0.0339,        # Small steps (0.03 = conservative, careful learning)
-    subsample=0.912,             # Use 91% of data for each tree (randomness)
-    colsample_bytree=0.749,      # Use 75% of features per tree
-    reg_alpha=0.000111,          # L1 regularization (lasso)
-    reg_lambda=1.359             # L2 regularization (ridge)
+    n_estimators=450,        # 450 sequential trees
+    max_depth=7,             # Shallower (prevent overfitting)
+    learning_rate=0.0339,    # Small step = conservative learning
+    subsample=0.912,         # Use 91% data per tree
+    colsample_bytree=0.749,  # Use 75% features per tree
+    reg_alpha=0.000111,      # L1 regularization (lasso)
+    reg_lambda=1.359         # L2 regularization (ridge)
 )
 ```
 
-> **Why learning_rate=0.034?** A lower learning rate = slower learning = less overfitting. Combined with more trees (n_estimators=450), this gives better generalization.
+### Algorithm 3: LightGBM
 
-### Algorithm 3: LightGBMRegressor (Light Gradient Boosting Machine)
+**What:** Like XGBoost but faster. Uses "leaf-wise" growth (grows most impactful leaf first).
 
-**What it is:** Similar to XGBoost but faster. Uses "leaf-wise" tree growth instead of "level-wise," which means it grows the most impactful leaf first.
+**Why:** Fastest gradient boosting, often outperforms XGBoost, **achieved our best R² = 0.9340**.
 
-**Why we use it:**
-- Fastest gradient boosting implementation
-- Handles large datasets efficiently
-- Often outperforms XGBoost on medium-sized data
-- Achieved our **best R² score (0.9340)**
-
-**Our tuned hyperparameters:**
 ```python
 LGBMRegressor(
-    n_estimators=300,            # 300 trees
-    max_depth=7,                 # Max depth per tree
-    learning_rate=0.0185,        # Very conservative learning
-    num_leaves=30,               # Max leaves per tree (LightGBM-specific!)
-    subsample=0.728,             # 73% of data per tree
-    colsample_bytree=0.962,      # 96% of features per tree
-    reg_alpha=1.17e-08,          # Almost no L1 regularization
-    reg_lambda=1.76e-05          # Very minimal L2 regularization
+    n_estimators=300,        # 300 trees
+    max_depth=7,
+    learning_rate=0.0185,    # Very conservative
+    num_leaves=30,           # Max leaves per tree (LightGBM-specific)
+    subsample=0.728,
+    colsample_bytree=0.962,
+    reg_alpha=1.17e-08,
+    reg_lambda=1.76e-05
 )
 ```
 
-> **`num_leaves`** is unique to LightGBM. Instead of controlling tree depth, you directly control how many leaf nodes the tree can have. `num_leaves=30` means each tree can make up to 30 different predictions.
+> **`num_leaves`** is unique to LightGBM. Controls how many leaf nodes (predictions) each tree can make.
 
 ### Classification Models
 
-For the 5-class success prediction, we use the same three algorithms plus the original:
-
 | Model | Type | Role |
 |-------|------|------|
-| GradientBoostingClassifier | Sklearn built-in | Original baseline |
+| GradientBoostingClassifier | Sklearn | Baseline |
 | XGBClassifier | XGBoost | Tuned with Optuna |
 | LGBMClassifier | LightGBM | Tuned with Optuna |
 
@@ -502,37 +700,25 @@ For the 5-class success prediction, we use the same three algorithms plus the or
 ## 8. Hyperparameter Tuning with Optuna
 
 ### What Are Hyperparameters?
-
-**Parameters** are learned during training (e.g., decision boundaries in trees).
-**Hyperparameters** are set BEFORE training (e.g., how many trees, how deep).
-
-Choosing good hyperparameters is crucial — bad choices lead to underfitting (too simple) or overfitting (memorizing training data).
+- **Parameters:** Learned during training (decision boundaries)
+- **Hyperparameters:** Set BEFORE training (how many trees, how deep)
 
 ### What is Optuna?
-
-Optuna is an **automated hyperparameter optimization framework**. Instead of manually trying different values, Optuna intelligently searches for the best combination.
-
-### How Optuna Works
+Optuna is an **automated hyperparameter optimization framework** using TPE (Tree-structured Parzen Estimator) — it learns from previous trials which regions are most promising.
 
 ```
 Trial 1:  n_estimators=150, max_depth=5  → R² = 0.89
 Trial 2:  n_estimators=300, max_depth=10 → R² = 0.91
-Trial 3:  n_estimators=250, max_depth=8  → R² = 0.92  ← looks promising!
-Trial 4:  n_estimators=280, max_depth=9  → R² = 0.915 ← try nearby values
+Trial 3:  n_estimators=250, max_depth=8  → R² = 0.92  ← promising!
 ...
 Trial 50: n_estimators=200, max_depth=14 → R² = 0.934 ← BEST!
 ```
 
-Optuna uses **Tree-structured Parzen Estimator (TPE)** — it learns from previous trials which regions of the hyperparameter space are most promising and focuses exploration there.
-
-### Code Example (from our trainer):
+**50 trials per model × 5 models = 250 total experiments**
 
 ```python
 def tune_rf_regressor(self, X_train, y_train):
-    """Tune RandomForest hyperparameters"""
-
     def objective(trial):
-        # Optuna suggests values to try
         params = {
             'n_estimators': trial.suggest_int('n_estimators', 100, 500, step=50),
             'max_depth': trial.suggest_int('max_depth', 5, 25),
@@ -540,39 +726,20 @@ def tune_rf_regressor(self, X_train, y_train):
             'min_samples_leaf': trial.suggest_int('min_samples_leaf', 1, 8),
             'max_features': trial.suggest_categorical('max_features', ['sqrt', 'log2', None]),
         }
-
-        # Train with these params and evaluate
         model = RandomForestRegressor(**params)
         scores = cross_val_score(model, X_train, y_train, cv=5, scoring='r2')
-        return scores.mean()  # Optuna maximizes this value
+        return scores.mean()
 
-    # Run 50 trials
     study = optuna.create_study(direction='maximize')
     study.optimize(objective, n_trials=50)
-
-    return study.best_params  # The winning combination!
+    return study.best_params
 ```
-
-### Optuna Search Spaces We Used
-
-| Parameter | Search Range | What It Controls |
-|-----------|-------------|-----------------|
-| `n_estimators` | 100-500 | Number of trees |
-| `max_depth` | 3-25 | Tree depth (complexity) |
-| `learning_rate` | 0.01-0.3 (log scale) | How fast model learns |
-| `subsample` | 0.6-1.0 | Fraction of data per tree |
-| `colsample_bytree` | 0.6-1.0 | Fraction of features per tree |
-| `reg_alpha` | 1e-8 to 10 | L1 regularization strength |
-| `reg_lambda` | 1e-8 to 10 | L2 regularization strength |
-| `num_leaves` | 20-100 | Max leaves (LightGBM only) |
 
 ---
 
-## 9. Ensemble Learning: Combining Models
+## 9. Ensemble Learning
 
-### Why Ensemble?
-
-Individual models have different strengths:
+### Why Combine Models?
 
 | Model | Strength | Weakness |
 |-------|----------|----------|
@@ -580,380 +747,617 @@ Individual models have different strengths:
 | XGBoost | Great at capturing patterns | Can overfit on small data |
 | LightGBM | Fast, handles diverse features | Sensitive to noise |
 
-By **combining** them, we get the best of all worlds. Errors from one model are compensated by the others.
-
-### How Our Ensemble Works
-
-#### Revenue: Weighted VotingRegressor
+### Revenue: Weighted VotingRegressor
 
 ```
 Input: Movie features
-         │
-    ┌────┴────┬────────────┐
-    ▼         ▼            ▼
+    ┌────────┬────────────┐
+    ▼        ▼            ▼
 RandomForest  XGBoost    LightGBM
-  predicts    predicts   predicts
   $450M       $480M      $520M
-    │         │            │
-    ▼         ▼            ▼
- × 0.332   × 0.332     × 0.336     (weights based on R² scores)
-    │         │            │
-    └────┬────┘            │
-         └────────┬────────┘
-                  ▼
-    Weighted Average = $483.5M
+  × 0.332   × 0.332     × 0.336  ← weights from R² scores
+         Weighted Average = $483.5M
 ```
 
-**Code:**
 ```python
-# Weights proportional to each model's R² score
 total_r2 = rf_r2 + xgb_r2 + lgbm_r2
-weights = [rf_r2 / total_r2, xgb_r2 / total_r2, lgbm_r2 / total_r2]
-# Result: [0.332, 0.332, 0.336] — LightGBM gets slightly more weight (best R²)
+weights = [rf_r2/total_r2, xgb_r2/total_r2, lgbm_r2/total_r2]
 
-ensemble_model = VotingRegressor(
-    estimators=[
-        ('rf', RandomForestRegressor(**rf_best_params)),
-        ('xgb', XGBRegressor(**xgb_best_params)),
-        ('lgbm', LGBMRegressor(**lgbm_best_params))
-    ],
+ensemble = VotingRegressor(
+    estimators=[('rf', rf_model), ('xgb', xgb_model), ('lgbm', lgbm_model)],
     weights=weights
 )
 ```
 
-#### Classification: Soft VotingClassifier
+### Classification: Soft VotingClassifier
 
-Instead of averaging predictions (which are numbers for regression), classification uses **probability voting**:
+Uses **probability averaging** instead of majority vote:
 
-```
-Input: Movie features
-         │
-    ┌────┴────┬────────────┐
-    ▼         ▼            ▼
-GradBoost   XGBoost    LightGBM
- predicts   predicts    predicts
- probabilities:
- Block: 0.1   0.2         0.15
- Super: 0.2   0.15        0.25
- Hit:   0.4   0.35        0.30     ← Average probabilities
- Avg:   0.2   0.2         0.20
- Flop:  0.1   0.1         0.10
-                  ▼
-    Average → Hit (highest average probability)
-```
-
-**Code:**
 ```python
 ensemble_cls = VotingClassifier(
-    estimators=[
-        ('gb', GradientBoostingClassifier(...)),
-        ('xgb', XGBClassifier(...)),
-        ('lgbm', LGBMClassifier(...))
-    ],
-    voting='soft'  # Use probability averaging, not majority vote
+    estimators=[('gb', gb_model), ('xgb', xgb_model), ('lgbm', lgbm_model)],
+    voting='soft'  # Average probabilities, not hard votes
 )
 ```
 
-> **`voting='soft'` vs `voting='hard'`:**
-> - `hard`: Each model votes for one class, majority wins (like elections)
-> - `soft`: Each model gives probabilities, average probabilities win (more nuanced, usually better)
-
 ---
 
-## 10. Cross-Validation: Honest Evaluation
+## 10. Cross-Validation & Evaluation
 
-### The Problem with Single Train/Test Split
-
-If you just split data once (80/20), your results depend on **which** 20% you happened to pick. You could get lucky or unlucky.
-
-### What is K-Fold Cross-Validation?
-
-Split data into K parts ("folds"), train on K-1 parts, test on 1 part. Repeat K times:
+### 5-Fold Cross-Validation
 
 ```
-5-Fold Cross-Validation:
-
 Fold 1: [TEST] [Train] [Train] [Train] [Train]  → Score: 0.92
 Fold 2: [Train] [TEST] [Train] [Train] [Train]  → Score: 0.91
 Fold 3: [Train] [Train] [TEST] [Train] [Train]  → Score: 0.93
 Fold 4: [Train] [Train] [Train] [TEST] [Train]  → Score: 0.90
 Fold 5: [Train] [Train] [Train] [Train] [TEST]  → Score: 0.92
-
-Final CV Score = Mean ± Std = 0.916 ± 0.031
+Final = 0.916 ± 0.031
 ```
-
-Every data point gets to be in the test set exactly once!
 
 ### Stratified K-Fold (for Classification)
 
-Regular K-Fold randomly splits data. But if your classes are **imbalanced** (e.g., many Hits, few Blockbusters), a random split might put all Blockbusters in one fold.
+Ensures each fold has the **same class proportions** — critical for imbalanced datasets.
 
-**Stratified K-Fold** ensures each fold has the **same proportion** of each class:
-
-```
-Dataset: 40% Hit, 30% Flop, 15% Average, 10% Super Hit, 5% Blockbuster
-
-Each fold will have exactly:
-  40% Hit, 30% Flop, 15% Average, 10% Super Hit, 5% Blockbuster
-```
-
-**Code:**
 ```python
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 cv_scores = cross_val_score(ensemble_cls, X_train, y_train, cv=skf, scoring='accuracy')
-# Result: [0.54, 0.56, 0.58, 0.52, 0.54] → Mean: 0.547 ± 0.064
 ```
-
-### Our CV Results
-
-| Model | CV Mean | ± Std | Interpretation |
-|-------|---------|-------|---------------|
-| Revenue Ensemble | **0.916** | ± 0.031 | Very stable, high performance |
-| Classification Ensemble | **0.547** | ± 0.064 | Moderate — 5-class problem is hard |
 
 ---
 
 ## 11. Model Performance & Results
 
-### Revenue Prediction Results
+### Revenue Prediction
 
-| Model | R² Score | MAE (log) | Meaning |
-|-------|----------|-----------|---------|
-| RandomForest (old) | 0.9083 | 0.42 | Baseline before improvements |
-| **RandomForest** (Optuna-tuned) | **0.9210** | 0.2984 | +1.4% improvement |
-| **XGBoost** (Optuna-tuned) | **0.9229** | 0.2995 | +1.6% improvement |
-| **LightGBM** (Optuna-tuned) | **0.9340** 🏆 | 0.2828 | **+2.8% improvement (BEST)** |
-| **Ensemble** (weighted voting) | **0.9294** | 0.2852 | All 3 combined |
+| Model | R² Score | MAE (log) | Improvement |
+|-------|----------|-----------|-------------|
+| RandomForest (old baseline) | 0.9083 | 0.42 | — |
+| **RandomForest** (Optuna) | **0.9210** | 0.2984 | +1.4% |
+| **XGBoost** (Optuna) | **0.9229** | 0.2995 | +1.6% |
+| **LightGBM** (Optuna) | **0.9340** 🏆 | 0.2828 | **+2.8%** |
+| **Ensemble** (weighted) | **0.9294** | 0.2852 | +2.3% |
 
-> **R² = 0.934 means:** The model explains **93.4%** of the variance in movie revenue. Only 6.6% of revenue variation is unexplained (due to luck, marketing, etc.).
+> **R² = 0.934** means the model explains **93.4%** of revenue variance. MAE = 0.28 in log space ≈ ±32% in dollars.
 
-> **MAE = 0.28 (in log space)** means: On average, our prediction is off by `e^0.28 - 1 ≈ 32%` of the actual revenue. For a $100M movie, we'd predict somewhere between $68M-$132M.
-
-### Classification Results
+### Classification
 
 | Model | Accuracy | Notes |
 |-------|----------|-------|
-| GradientBoosting | 55.9% | Original sklearn model |
-| XGBoost (tuned) | **57.4%** | Best individual model |
+| GradientBoosting | 55.9% | Original baseline |
+| XGBoost (tuned) | **57.4%** | Best individual |
 | LightGBM (tuned) | **57.4%** | Tied for best |
-| Ensemble (soft voting) | 56.5% | Combined |
-| Stratified 5-Fold CV | **54.7% ± 6.4%** | Honest evaluation |
+| Ensemble (soft) | 56.5% | Combined |
+| 5-Fold CV | **54.7% ± 6.4%** | Honest evaluation |
 
-> **Why is 57% "good" for 5 classes?**
-> - Random guessing = 20% (1 out of 5)
-> - Our model = 57% = **2.85× better than random**
-> - Adjacent classes (Hit vs Super Hit) are very similar, making exact classification hard
-> - The model rarely confuses Blockbusters with Flops — it's the middle categories that overlap
-
-### Ensemble Weights
-
-| Model | Weight (Revenue) | Meaning |
-|-------|-----------------|---------|
-| RandomForest | 0.332 (33.2%) | Equal contribution |
-| XGBoost | 0.332 (33.2%) | Equal contribution |
-| LightGBM | **0.336 (33.6%)** | Slightly more weight (best R²) |
+> **Why 57% is good for 5 classes:** Random guessing = 20%. Our model = 2.85× better. Adjacent categories (Hit vs Super Hit) overlap — the model rarely confuses Blockbusters with Flops.
 
 ---
 
 ## 12. SHAP Explainability
 
-### What is SHAP?
-
-**SHAP (SHapley Additive exPlanations)** is a method to explain individual predictions. It tells you exactly which features pushed the prediction up or down, and by how much.
-
-Based on **Shapley values** from game theory — a fair way to distribute credit among players in a cooperative game.
-
-### How We Use It
-
-For each prediction, we can explain:
+**SHAP (SHapley Additive exPlanations)** explains individual predictions — which features pushed prediction up or down, and by how much.
 
 ```
-Prediction: This movie will be a "Hit" (predicted revenue: $350M)
+Prediction: "Hit" ($350M)
 
 Why?
-  budget = $150M         → pushed prediction UP by $120M    ████████████
-  cast_popularity = 65   → pushed prediction UP by $50M     █████
-  genre_action = 1       → pushed prediction UP by $30M     ███
-  is_summer_release = 1  → pushed prediction UP by $20M     ██
-  trailer_views = 5M     → pushed prediction DOWN by -$10M  █ (low views)
-  is_sequel = 0          → pushed prediction DOWN by -$15M  ██ (not a sequel)
+  budget = $150M         → UP by $120M    ████████████
+  cast_popularity = 65   → UP by $50M     █████
+  genre_action = 1       → UP by $30M     ███
+  is_summer_release = 1  → UP by $20M     ██
+  trailer_views = 5M     → DOWN by -$10M  █ (low)
+  is_sequel = 0          → DOWN by -$15M  ██ (not sequel)
 ```
 
-### Feature Importance (Averaged Across All Predictions)
+### Top 10 Most Important Features
 
-From our ensemble model, the top 10 most important features:
-
-| Rank | Feature | Importance | What This Means |
-|------|---------|------------|-----------------|
-| 1 | `budget` | High | Budget is the #1 indicator of revenue potential |
-| 2 | `trailer_views_log` | High | Pre-release buzz strongly predicts success |
-| 3 | `popularity` | Medium-High | TMDB popularity captures public awareness |
-| 4 | `vote_count` | Medium | More votes = more viewers |
-| 5 | `cast_popularity` | Medium | Star power still matters |
-| 6 | `director_popularity` | Medium | Known directors draw audiences |
-| 7 | `vote_average` | Medium | Quality matters, but budget matters more |
-| 8 | `runtime` | Low-Medium | Optimal length exists (~120-150 min) |
-| 9 | `is_summer_release` | Low | Seasonal advantage is modest |
-| 10 | `genre_action` | Low | Action has slight edge but isn't decisive |
+| Rank | Feature | Impact |
+|------|---------|--------|
+| 1 | `budget` | Highest |
+| 2 | `trailer_views_log` | High |
+| 3 | `popularity` | Medium-High |
+| 4 | `vote_count` | Medium |
+| 5 | `cast_popularity` | Medium |
+| 6 | `director_popularity` | Medium |
+| 7 | `vote_average` | Medium |
+| 8 | `runtime` | Low-Medium |
+| 9 | `is_summer_release` | Low |
+| 10 | `genre_action` | Low |
 
 ---
 
-## 13. Prediction Flow: From Input to Output
+## 13. Prediction Flow: Input to Output
 
 ### What Happens When a User Clicks "Predict"
 
 ```
 1. USER fills form:
-   Title: "Avengers 5"
-   Budget: $250,000,000
-   Genre: Action, Adventure
-   Industry: Hollywood
-   Director Popularity: 85
-   Cast Popularity: 90
-   Release Month: July
-   Is Sequel: Yes
+   Title: "Avengers 5", Budget: $250M, Genre: Action+Adventure
+   Industry: Hollywood, Director: 85, Cast: 90, Month: July, Sequel: Yes
 
-2. REACT sends POST request to Node.js:
-   POST http://localhost:5000/api/ml/predict
-   Body: { budget: 250000000, genres: ["Action", "Adventure"], ... }
+2. REACT → POST http://localhost:5000/api/predictions/predict
+   Body: { budget: 250000000, genres: ["Action","Adventure"], ... }
 
-3. NODE.JS proxies to ML Service:
-   POST http://localhost:5001/api/predict
+3. NODE.JS proxies → POST http://localhost:5001/api/predict
 
-4. PREDICTOR.PY processes:
-
+4. PREDICTOR.PY:
    a) _prepare_features(data):
-      Creates dict with 34 features, fills in values:
-      {
-        budget: 250000000,
-        runtime: 120,
-        genre_action: 1,
-        genre_adventure: 1,
-        genre_comedy: 0,
-        ...
-        industry_hollywood: 1,
-        director_popularity: 85,
-        cast_popularity: 90,
-        is_sequel: 1,
-        is_summer_release: 1,
-        ...
-      }
-
+      Creates 34-feature dict, fills values, handles missing data
    b) scaler.transform(features):
-      Converts each feature to z-score:
-      budget 250M → standardized to ~2.1 (2.1 std devs above mean)
-      cast_popularity 90 → standardized to ~3.5
-
-   c) revenue_model.predict(scaled_features):
-      Ensemble makes prediction:
-        RF predicts: 21.2 (in log-revenue)
-        XGB predicts: 21.5
-        LGBM predicts: 21.3
-        Weighted avg: 21.33
-      
-      Convert back: expm1(21.33) = $1,837,000,000
-
-   d) classifier_model.predict(scaled_features):
-      → "Blockbuster" (with 78% confidence)
-
+      budget 250M → z-score ~2.1 (2.1 std devs above mean)
+   c) revenue_model.predict():
+      RF: 21.2, XGB: 21.5, LGBM: 21.3 → Weighted avg: 21.33
+      Convert: expm1(21.33) = $1,837,000,000
+   d) classifier_model.predict():
+      → "Blockbuster" (78% confidence)
    e) Calculate ROI:
       ($1.837B - $250M) / $250M × 100 = 635%
 
-5. RESPONSE sent back:
-   {
-     predictions: {
-       successCategory: "Blockbuster",
-       predictedRevenue: 1837000000,
-       predictedROI: 635,
-       confidence: 78,
-       featureImportance: [
-         { feature: "Budget", impact: 0.35 },
-         { feature: "Cast Popularity", impact: 0.15 },
-         ...
-       ]
-     }
-   }
+5. RESPONSE:
+   { successCategory: "Blockbuster", predictedRevenue: 1837000000,
+     predictedROI: 635, confidence: 78, featureImportance: [...] }
 
-6. REACT renders the prediction card with animated badge
+6. REACT renders prediction card with animated badge
 ```
 
 ---
 
-## 14. Model Serialization: Saving & Loading
+## 14. Model Serialization
 
-### What is Pickle?
+### What We Save (Pickle Files)
 
-**Pickle** is Python's built-in serialization format. It converts Python objects (like trained models) into binary files that can be saved to disk and loaded later.
+| File | Contents | Size |
+|------|----------|------|
+| `revenue_model.pkl` | VotingRegressor (RF+XGB+LGBM) | ~24 MB |
+| `classifier_model.pkl` | VotingClassifier (GB+XGB+LGBM) | ~8 MB |
+| `scaler.pkl` | StandardScaler (mean/std per feature) | ~2 KB |
+| `label_encoder.pkl` | LabelEncoder (category ↔ number) | ~300 B |
+| `feature_columns.pkl` | List of 34 feature names | ~600 B |
+| `best_params.json` | Optuna's winning hyperparameters | ~1.2 KB |
+| `training_results.json` | All metrics + CV scores | ~640 B |
 
-### What We Save
-
-| File | What's Inside | Size | Why |
-|------|--------------|------|-----|
-| `revenue_model.pkl` | VotingRegressor (3 models inside) | ~24 MB | Contains RF, XGB, LGBM with learned parameters |
-| `classifier_model.pkl` | VotingClassifier (3 models inside) | ~7.7 MB | Contains GB, XGB, LGBM classifiers |
-| `scaler.pkl` | StandardScaler | ~2 KB | Mean and std of each feature (from training data) |
-| `label_encoder.pkl` | LabelEncoder | ~300 B | Mapping: 0=Average, 1=Blockbuster, 2=Flop, 3=Hit, 4=Super Hit |
-| `feature_columns.pkl` | List of 34 strings | ~600 B | Ensuring prediction features are in correct order |
-| `best_params.json` | Dict of dicts | ~1.2 KB | Optuna's best hyperparameters |
-| `training_results.json` | Metrics dict | ~640 B | R² scores, accuracies, CV results |
-
-### Save Code:
 ```python
-# Save model
-with open('revenue_model.pkl', 'wb') as f:    # 'wb' = write binary
+# Save
+with open('revenue_model.pkl', 'wb') as f:
     pickle.dump(self.revenue_model, f)
 
-# Load model
-with open('revenue_model.pkl', 'rb') as f:    # 'rb' = read binary
+# Load (happens once at server startup)
+with open('revenue_model.pkl', 'rb') as f:
     self.revenue_model = pickle.load(f)
 ```
 
-> **Why not retrain every time?** Training takes 14 minutes and requires MongoDB connection. Loading a pickle file takes <1 second. The server starts instantly with pre-trained models.
+> **Why not retrain every time?** Training takes ~14 minutes. Loading a pickle takes <1 second.
 
 ---
 
-## 15. Key Learnings & Insights
+# PART C: BACKEND (THE BACKBONE)
+
+---
+
+## 15. Node.js Server
+
+### Server Structure
+
+The Express server acts as the **API gateway** — it serves data from MongoDB and proxies ML requests to the Flask service.
+
+### API Endpoints
+
+#### Movies API (`/api/movies`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/movies` | List movies with filters, search, pagination |
+| GET | `/api/movies/:id` | Get single movie with full details |
+| GET | `/api/movies/stats` | Aggregated statistics (counts, averages) |
+| GET | `/api/movies/filters` | Available filter options |
+
+**Query Parameters:**
+- `industry` — Filter by Hollywood, Bollywood, etc.
+- `genre` — Filter by genre
+- `category` — Filter by success category
+- `search` — Text search on title
+- `sort` — Sort by popularity, revenue, rating, release date
+- `page`, `limit` — Pagination
+
+#### Talents API (`/api/talents`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/talents/search?q=&type=` | Search directors/actors by name |
+
+Uses MongoDB text search + regex for fuzzy matching. Returns TMDB popularity, known movies, and profile photos.
+
+#### Predictions API (`/api/predictions`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/predictions/predict` | Proxy to ML service `/api/predict` |
+| POST | `/api/predictions/explain` | Proxy to ML service `/api/explain` |
+| POST | `/api/predictions/optimal-release` | Optimal release month |
+| POST | `/api/predictions/competition` | Competition analysis |
+| POST | `/api/predictions/whatif` | What-if simulation |
+
+#### Trends API (`/api/trends`) — Powers the Insights Page
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/trends/yearly` | Industry trends over time |
+| GET | `/api/trends/genres` | Genre distribution analysis |
+| GET | `/api/trends/seasonal` | Monthly performance patterns |
+| GET | `/api/trends/talent/:type` | Top directors/actors by revenue |
+| GET | `/api/trends/regional` | Indian cinema comparison |
+| GET | `/api/trends/budget-revenue` | Budget vs Revenue scatter data |
+| GET | `/api/trends/youtube-hype` | Trailer views vs box office |
+| GET | `/api/trends/production-houses` | Production company rankings |
+| GET | `/api/trends/opening-weekend` | Opening weekend strength |
+| GET | `/api/trends/critic-audience` | Critic vs Audience score gap |
+
+---
+
+## 16. ML Service (Flask)
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| POST | `/api/predict` | Revenue + category prediction |
+| POST | `/api/explain` | SHAP feature importance |
+| POST | `/api/optimal-release` | Best release month analysis |
+| POST | `/api/batch-predict` | Predict multiple movies |
+
+### Key Modules
+
+**`predictor.py` (31KB):**
+- Loads all `.pkl` model files at startup
+- `predict(data)` — Full prediction pipeline
+- `explain(data)` — SHAP-based explanation
+- `get_optimal_release(data)` — Monthly revenue analysis
+- `_prepare_features(data)` — Creates 34-feature vector from raw input
+
+**`trainer.py` (35KB):**
+- Connects to MongoDB, fetches all movies
+- Engineers 34 features from raw data
+- Tunes hyperparameters with Optuna (50 trials × 5 models)
+- Trains individual + ensemble models
+- Evaluates with 5-fold CV
+- Saves everything to `.pkl` and `.json`
+
+---
+
+# PART D: FRONTEND (THE FACE)
+
+---
+
+## 17. Design System & Aesthetics
+
+### Design Philosophy
+GreenLit GO uses a **cinematic, premium dark theme** inspired by movie industry aesthetics — dark backgrounds, orange accents, and modern typography.
+
+### Color Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--primary` | `#ff8300` | Orange accent, CTAs, highlights |
+| `--bg-primary` | `#000000` | Page backgrounds |
+| `--bg-card` | `#111111` | Card backgrounds |
+| `--bg-elevated` | `#1a1a1a` | Elevated surfaces, borders |
+| `--text-primary` | `#ffffff` | Headings, primary text |
+| `--text-secondary` | `#999999` | Body text, descriptions |
+| `--text-muted` | `#666666` | Labels, hints |
+
+### Typography
+- **TT Firs Neue** — Primary font for headings and body
+- **Syne** — Secondary font for special headings
+- Font imported via `@font-face` in `index.css`
+
+### Animation Patterns
+- **Scroll-reveal:** Elements fade up as user scrolls (IntersectionObserver)
+- **Marquee:** Infinite horizontal scrolling (CSS keyframes)
+- **Hover effects:** Cards lift, glow, scale on hover
+- **Count-up:** Numbers animate from 0 to target value
+
+---
+
+## 18. Home Page
+
+**Files:** `Home.jsx` (10KB), `Home.css` (12KB)
+
+### Sections
+
+1. **Hero Section**
+   - Animated title: "DATA-DRIVEN BLOCKBUSTERS"
+   - Subtitle with typing effect
+   - CTA buttons: "Predict Now" → Upcoming Dashboard, "Explore Library" → Released Movies
+
+2. **Stats Bar**
+   - 4 animated counters: 1,600+ Movies | 93% Accuracy | 2015-25 Range | 5+ Industries
+   - Uses custom `useCountUp` hook for smooth number animation
+
+3. **Capabilities — Marquee Grid**
+   - **10 capability cards** in 2 infinite-scrolling rows (CSS `@keyframes`):
+     - Row 1: Revenue Prediction, Success Classification, Explainable AI, What-If Simulator, Competition Analyzer
+     - Row 2: Multi-Industry Support, Optimal Release Timing, Trend Analytics, Smart Dashboard, AI-Powered Insights
+   - Rows scroll in **opposite directions** for visual effect
+   - Cards pause on hover and show lift + orange glow animation
+   - Pure CSS — no JS animation library needed
+
+4. **CTA Section**
+   - "Ready to Predict Your Next Blockbuster?" with button linking to Upcoming Dashboard
+
+---
+
+## 19. Released Movies Library
+
+**Files:** `ReleasedMovies.jsx` (11KB), `ReleasedMovies.css` (10KB)
+
+### Features
+
+- **Netflix/IMDB-style movie grid** with poster cards
+- **FAB (Floating Action Button) Filter** — expandable filter panel:
+  - Industry: All, Hollywood, Bollywood, Tollywood, Kollywood, Mollywood
+  - Genre: Dropdown with all genres
+  - Success Category: Blockbuster, Super Hit, Hit, Average, Flop
+  - Sort: Popularity, Revenue, Rating, Release Date
+- **Text search** across movie titles
+- **Infinite scroll / pagination**
+- **Movie cards** show: poster, title, year, rating badge, success category badge
+- Click → navigates to Movie Detail page
+
+---
+
+## 20. Movie Detail Page
+
+**Files:** `MovieDetail.jsx` (13KB), `MovieDetail.css` (16KB)
+
+### Sections
+
+1. **Hero Banner** — Full-width backdrop image with gradient overlay
+2. **Key Metrics** — Budget, Revenue, ROI in large stat cards
+3. **Success Badge** — Animated category badge (Blockbuster/Hit/etc.)
+4. **Cast Section** — Profile photos, character names, popularity scores
+5. **Movie Info** — Runtime, release date, genres as tags, overview text
+6. **Ratings** — TMDB, IMDb, Metascore, Rotten Tomatoes (when available)
+
+---
+
+## 21. Insights Page (Data Analytics)
+
+**Files:** `Insights.jsx` (52KB), `Insights.css` (11KB)
+
+This is the **analytics dashboard** powered by ApexCharts — 8+ interactive visualization panels:
+
+### Charts
+
+| Chart | Type | What It Shows |
+|-------|------|--------------|
+| **Revenue Trends** | Line chart | Revenue over years, filterable by industry |
+| **Genre Distribution** | Bar/Treemap | Most common genres and their avg revenue |
+| **Seasonal Trends** | Area chart | Monthly revenue patterns (summer vs winter) |
+| **Budget vs Revenue** | Scatter plot | Correlation between investment and return |
+| **YouTube Hype vs Box Office** | Scatter plot | Trailer views → actual revenue |
+| **Production Houses** | Horizontal bar | Top studios ranked by total revenue |
+| **Opening Weekend** | Scatter | Opening weekend % of total gross |
+| **Critic vs Audience** | Diverging bar | Gap between RT critics and audience scores |
+| **Top Directors** | Table/bar | Highest-grossing directors |
+| **Regional Comparison** | Bar | Indian cinema: Bollywood vs Tollywood vs Kollywood |
+
+### Features
+- **Industry filter** at the top (All, Hollywood, Bollywood, etc.)
+- **Interactive tooltips** on every data point
+- **Responsive** — charts resize for all screen sizes
+- **Dark theme** matching the app's aesthetic
+
+---
+
+## 22. Upcoming Dashboard (Prediction Engine)
+
+**Files:** `UpcomingDashboard.jsx` (86KB!), `UpcomingDashboard.css` (30KB)
+
+This is the **largest and most complex page** — the core ML prediction interface.
+
+### Sections
+
+1. **Prediction Form**
+   - Movie title input
+   - Industry selection (5 industries with flags)
+   - Genre selection (multi-select chip UI)
+   - Budget input with currency formatting
+   - Runtime input
+   - Release month selector
+   - Sequel toggle
+
+2. **Talent Search**
+   - **Director search** with TMDB auto-complete (TalentSearch component)
+   - **Cast search** with multi-select, shows popularity score for each selected actor
+   - Average cast popularity auto-calculated
+
+3. **Prediction Results Panel** (appears after predict)
+   - **Success category badge** with animation
+   - **Predicted revenue** with formatting
+   - **Predicted ROI** percentage
+   - **Confidence score** with progress bar
+   - **SHAP Feature Importance** bar chart
+
+4. **Optimal Release Timing**
+   - Monthly revenue heatmap
+   - Best month recommendation
+   - Seasonal analysis
+
+5. **Competition Analysis**
+   - Movies releasing in same window
+   - Threat assessment scores
+   - Competition density
+
+6. **What-If Simulator**
+   - Sliders for budget, runtime, release month
+   - Real-time prediction updates as user adjusts
+   - Side-by-side comparison of scenarios
+
+---
+
+## 23. About Us Page
+
+**Files:** `About.jsx` (17KB), `About.css` (14KB)
+
+Premium dark-themed page with 6 sections:
+
+1. **Hero** — "About GreenLit GO" with orange glow effect and "INTRODUCTION" label
+2. **Our Mission** — Mission text + 4 stat cards (1,600+ Movies, 5 Industries, 40+ ML Features, 93% Model Accuracy) with SVG icons
+3. **Built With Precision** — 8 tech stack cards with **real brand logos** from devicon CDN:
+   - React, Node.js, Python, MongoDB, Flask, Scikit-Learn, XGBoost, TMDB API
+4. **What We Offer** — Vertical timeline with orange dots, 6 capability descriptions
+5. **Meet the Builders** — 3 team cards matching reference design:
+   - **Rushit Trambadia** — ML & Backend Developer (with photo)
+   - **Vandit Doshi** — Frontend Developer (with photo)
+   - **Prof. Priyanka Mangi** — Project Guide (placeholder initials)
+6. **CTA Footer** — Orange gradient banner: "Ready to Greenlight Your Next Hit?" with buttons to Predict and Library pages
+
+### Design Features
+- Scroll-reveal animations (IntersectionObserver)
+- Section dividers between each section
+- Fully responsive for all screen sizes
+
+---
+
+## 24. Reusable Components
+
+### Navbar (`Navbar.jsx`)
+- Fixed top navigation bar
+- Logo "GreenLit **GO**" with orange accent
+- Links: Home, Released Movies, Insights, Upcoming Movies, About Us
+- Active page highlighting
+- Responsive hamburger menu on mobile
+
+### Footer (`Footer.jsx`)
+- Multi-column footer with links to all pages
+- Social media icons (placeholders)
+- Copyright notice
+- GreenLit GO branding
+
+### FilterFab (`FilterFab.jsx`)
+- **Floating Action Button** that expands into a filter panel
+- Used on Released Movies page
+- Animated expand/collapse
+- Industry, Genre, Category, Sort filters
+- Apply/Reset buttons
+
+### TalentSearch (`TalentSearch.jsx`)
+- TMDB-powered autocomplete search
+- Works for both directors and actors
+- Shows profile photos, popularity scores, known movies
+- Used in Upcoming Dashboard for director/cast selection
+
+### MovieCard (`MovieCard.jsx`)
+- Reusable movie poster card
+- Shows: poster image, title, year, rating, success badge
+- Hover effects (lift, shadow)
+- Click navigates to Movie Detail page
+
+---
+
+# PART E: WRAP-UP
+
+---
+
+## 25. Key Learnings & Insights
 
 ### What We Learned About Movie Success
-
-1. **Money predicts money** — Budget is the #1 feature. Studios that invest more typically earn more (but not always proportionally).
-
-2. **Trailers matter A LOT** — YouTube trailer views are the 2nd most important feature. Pre-release buzz is a strong signal.
-
-3. **Stars still sell tickets** — Director and cast popularity are significant features, confirming that star power hasn't died in the streaming era.
-
-4. **Timing is modest** — Summer and holiday releases have a small advantage, but aren't decisive. A great movie can succeed any time.
-
-5. **Sequels have an edge** — Built-in audiences make sequels more predictable (lower risk, but not necessarily higher ROI).
+1. **Money predicts money** — Budget is the #1 feature
+2. **Trailers matter A LOT** — YouTube views are the #2 feature
+3. **Stars still sell tickets** — Director/cast popularity are significant
+4. **Timing is modest** — Summer/holiday releases have small advantage
+5. **Sequels have an edge** — Built-in audiences reduce risk
 
 ### What We Learned About ML
+1. **Log transformation is essential** for skewed targets (R² 0.72 → 0.93)
+2. **Hyperparameter tuning matters** — Optuna improved R² by +2.8%
+3. **Ensemble > Individual** — No single model always wins
+4. **Honest evaluation is crucial** — Stratified K-Fold gives real performance
+5. **Feature engineering > more data** — 34 engineered features from 1,600 movies outperforms raw data from 10,000
 
-1. **Log transformation is essential** for skewed targets — Without it, R² was 0.72. With it: 0.93.
-
-2. **Hyperparameter tuning matters** — Optuna improved R² from 0.9083 to 0.9340 (+2.8%).
-
-3. **Ensemble > Individual** — No single model is always best. Combining three models gives stable, high performance.
-
-4. **Honest evaluation is crucial** — The old "85% accuracy" was misleading. Stratified K-Fold gives the real picture (54.7%).
-
-5. **Feature engineering > more data** — Our 34 carefully engineered features from 1,652 movies outperform models trained on raw data from 10,000 movies.
-
-6. **StandardScaler is necessary** — Without scaling, models that use distance/gradient (XGBoost, LightGBM) would be dominated by large-scale features like budget ($200M) over vote_average (7.5).
+### What We Learned About Web Development
+1. **Component architecture** pays off — reusable Navbar, Footer, FilterFab save time
+2. **Vanilla CSS > frameworks** — Full control over dark theme, animations, responsive design
+3. **Scroll-reveal animations** make pages feel premium with minimal code
+4. **ApexCharts** is excellent for React data visualization
+5. **Proxy pattern** (Node → Flask) cleanly separates JS and Python worlds
 
 ### Technical Decisions & Rationale
 
 | Decision | Why |
 |----------|-----|
-| RandomForest + XGBoost + LightGBM | Three different tree algorithms that complement each other |
-| 50 Optuna trials | Balances search quality vs training time (~14 min total) |
-| Weighted voting (not simple average) | Better models get proportionally more influence |
-| Soft voting for classification | Probability-based voting outperforms hard majority voting |
-| 80/20 train-test split | Standard split; with 1,652 samples, 20% test ≈ 330 movies |
-| 5-fold CV | Industry standard; gives 5 independent estimates |
-| Log1p instead of log | Handles zero-revenue movies safely (`log(0)` = error, `log(0+1)` = 0) |
+| RF + XGBoost + LightGBM ensemble | Three complementary tree algorithms |
+| 50 Optuna trials per model | Balances quality vs training time (~14 min) |
+| Weighted voting | Better models get proportionally more influence |
+| Soft voting for classification | Probability averaging > hard majority |
+| React + Vite | Fastest build tool, modern React |
+| Vanilla CSS | Maximum flexibility for custom dark theme |
+| MongoDB | Schema-flexible for varied movie data structures |
+| Flask for ML | Python ecosystem + lightweight serving |
+| devicon CDN for logos | Real brand logos without bundling image assets |
 
 ---
 
-*Report Generated: February 10, 2026*
-*For: GreenLit GO — Movie Success Prediction Project*
-*ML Stack: scikit-learn + XGBoost + LightGBM + Optuna + SHAP*
+## 26. How to Run the Project
+
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- MongoDB (local or Atlas)
+
+### Step 1: Start MongoDB
+```bash
+mongod
+# or use MongoDB Atlas (cloud) with connection string in .env
+```
+
+### Step 2: Start ML Service (Port 5001)
+```bash
+cd ml-service
+pip install -r requirements.txt
+python -m app
+```
+
+### Step 3: Start Node.js Server (Port 5000)
+```bash
+cd server
+npm install
+npm run dev
+```
+
+### Step 4: Start React Client (Port 5173)
+```bash
+cd client
+npm install
+npm run dev
+```
+
+### Step 5: Open Browser
+Navigate to **http://localhost:5173**
+
+### Environment Variables
+
+**`server/.env`:**
+```
+MONGODB_URI=mongodb://localhost:27017/greenlit-go
+ML_SERVICE_URL=http://localhost:5001
+PORT=5000
+```
+
+**`data-collection/.env`:**
+```
+TMDB_API_KEY=your_tmdb_api_key
+OMDB_API_KEY=your_omdb_api_key
+YOUTUBE_API_KEY=your_youtube_api_key
+MONGODB_URI=mongodb://localhost:27017/greenlit-go
+```
+
+---
+
+*Report Updated: March 4, 2026*
+*Project: GreenLit GO — Movie Success Prediction Platform*
+*Team: Rushit Trambadia (ML & Backend) + Vandit Doshi (Frontend)*
+*Guide: Prof. Priyanka Mangi*
+*Stack: React + Node.js + Python (Scikit-learn + XGBoost + LightGBM + Optuna + SHAP) + MongoDB*
