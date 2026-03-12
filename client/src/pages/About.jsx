@@ -19,7 +19,7 @@ const About = () => {
         },
         {
             icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8300" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" /><path d="M10 21h4M10 17v-1a2 2 0 012-2h0a2 2 0 012 2v1" /></svg>,
-            value: '40+', label: 'ML Features'
+            value: '34', label: 'ML Features'
         },
         {
             icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8300" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,

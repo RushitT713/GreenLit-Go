@@ -83,3 +83,5 @@ ehthumbs.db
 TODO.md
 ML_DETAILED_REPORT.md
 PROJECT_REPORT.md
+migrate_to_atlas.py
+gantt_chart.py
