@@ -7,6 +7,7 @@ const movieRoutes = require('./routes/movies');
 const predictionRoutes = require('./routes/predictions');
 const trendsRoutes = require('./routes/trends');
 const talentsRoutes = require('./routes/talents');
+const scriptsRoutes = require('./routes/scripts');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/movies', movieRoutes);
 app.use('/api/predictions', predictionRoutes);
 app.use('/api/trends', trendsRoutes);
 app.use('/api/talents', talentsRoutes);
+app.use('/api/scripts', scriptsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

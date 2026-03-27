@@ -47,6 +47,7 @@
 .dashboard-header {
     position: relative;
     padding: 140px 0 60px;
+    /* padding: 150px 0; */
     overflow: hidden;
     border-bottom: 1px solid #1a1a1a;
 }
@@ -532,15 +533,20 @@
     align-items: center;
     gap: 20px;
     padding: 24px;
-    background: #141414;
-    border: 1px solid #2a2a2a;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border-radius: 16px;
     transition: all 0.3s ease;
 }
 
 .metric-card:hover {
-    border-color: #444444;
-    transform: translateX(4px);
+    border-color: rgba(255, 77, 0, 0.5);
+    background: rgba(255, 77, 0, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(255, 77, 0, 0.15);
 }
 
 .metric-icon {
@@ -1503,4 +1509,161 @@
     .competing-movies-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ─── AI Script Upload Zone (Imported from ScriptAnalysis) ─── */
+.sa-dropzone {
+    width: 100%;
+    border: 2px dashed #333333;
+    border-radius: 20px;
+    background: #0d0d0d;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.sa-dropzone:hover {
+    border-color: #555;
+    background: #111111;
+}
+
+.sa-dropzone.dragging {
+    border-color: var(--accent-orange);
+    background: rgba(255, 77, 0, 0.05);
+    box-shadow: 0 0 30px rgba(255, 77, 0, 0.1);
+}
+
+.sa-dropzone.has-file {
+    border-color: #00c853;
+    background: rgba(0, 200, 83, 0.03);
+}
+
+.sa-drop-icon {
+    display: block;
+}
+
+.sa-drop-text {
+    font-family: 'TT Firs Neue', sans-serif;
+    color: #cccccc;
+    margin-bottom: 8px;
+}
+
+.sa-drop-subtext {
+    font-family: 'TT Firs Neue', sans-serif;
+    color: #666666;
+}
+
+.sa-file-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'TT Firs Neue', sans-serif;
+}
+
+.sa-file-name {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.sa-spinner {
+    display: inline-block;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent-orange);
+    border-radius: 50%;
+    animation: sa-spin 0.7s linear infinite;
+}
+
+@keyframes sa-spin {
+    to { transform: rotate(360deg); }
+}
+
+.sa-loading-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #888;
+    font-family: 'TT Firs Neue', sans-serif;
+    animation: sa-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sa-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* ─── UI Enhancements: AI Magic Card & Tooltips ─── */
+.ai-magic-card {
+    position: relative;
+    background: rgba(255, 77, 0, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+    z-index: 1;
+}
+
+.ai-magic-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px; /* border thickness */
+    background: linear-gradient(135deg, rgba(255,77,0,0.8), rgba(255,165,0,0.4), rgba(255,77,0,0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: magic-border-pulse 3s linear infinite;
+}
+
+@keyframes magic-border-pulse {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    50% { filter: hue-rotate(30deg) brightness(1.5); }
+    100% { filter: hue-rotate(0deg) brightness(1); }
+}
+
+.tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #888;
+    font-size: 0.7rem;
+    margin-left: 6px;
+    cursor: help;
+    position: relative;
+}
+
+.tooltip-icon:hover {
+    background: var(--accent-orange);
+    color: #000;
+}
+
+.tooltip-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 150%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #111;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: 'TT Firs Neue', sans-serif;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    border: 1px solid #333;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.tooltip-icon:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }

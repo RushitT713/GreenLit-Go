@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Chart from 'react-apexcharts';
-import { predictionService, trendsService } from '../services/api';
+import { predictionService, trendsService, scriptService } from '../services/api';
 import { DirectorSearch, CastSearch } from '../components/common/TalentSearch';
 import './UpcomingDashboard.css';
 
@@ -22,6 +22,19 @@ const UpcomingDashboard = () => {
         googleTrendsScore: ''
     });
 
+    const [scriptFile, setScriptFile] = useState(null);
+    const [scriptScore, setScriptScore] = useState(null); // Will hold the Gemini output
+    const [uploadingScript, setUploadingScript] = useState(false);
+    const [isDraggingPredict, setIsDraggingPredict] = useState(false);
+
+    const handleDragOverPredict = (e) => { e.preventDefault(); setIsDraggingPredict(true); };
+    const handleDragLeavePredict = () => setIsDraggingPredict(false);
+    const handleDropPredict = (e) => {
+        e.preventDefault(); setIsDraggingPredict(false);
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile) handleScriptUpload({ target: { files: [droppedFile] } });
+    };
+
     const [prediction, setPrediction] = useState(null);
     const [loading, setLoading] = useState(false);
     const [activeSection, setActiveSection] = useState('predict');
@@ -38,8 +51,21 @@ const UpcomingDashboard = () => {
     });
     const [simResult, setSimResult] = useState(null);
     const [simLoading, setSimLoading] = useState(false);
+    
+    // Sim Script upload state
+    const [simScriptFile, setSimScriptFile] = useState(null);
+    const [simScriptScore, setSimScriptScore] = useState(null);
+    const [uploadingSimScript, setUploadingSimScript] = useState(false);
+    const [isDraggingSim, setIsDraggingSim] = useState(false);
 
-    // Initialize sim data when switching to simulate tab or when prediction completes
+    const handleDragOverSim = (e) => { e.preventDefault(); setIsDraggingSim(true); };
+    const handleDragLeaveSim = () => setIsDraggingSim(false);
+    const handleDropSim = (e) => {
+        e.preventDefault(); setIsDraggingSim(false);
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile) handleSimScriptUpload({ target: { files: [droppedFile] } });
+    };
+
     const initSimData = () => {
         setSimData({
             budget: formData.budget || '',
@@ -47,6 +73,8 @@ const UpcomingDashboard = () => {
             genres: [...(formData.genres || [])],
             isSequel: formData.isSequel || false
         });
+        setSimScriptFile(null);
+        setSimScriptScore(null);
         setSimResult(null);
     };
 
@@ -100,6 +128,10 @@ const UpcomingDashboard = () => {
             if (changes.genres) changeDescriptions.push(`Genres changed`);
             if (changes.isSequel !== undefined) changeDescriptions.push(changes.isSequel ? 'Made Sequel' : 'Made Standalone');
 
+            if (simScriptScore) {
+                changeDescriptions.push('Updated Script Analysis');
+            }
+
             modifications.push({
                 name: changeDescriptions.join(' + '),
                 changes
@@ -118,7 +150,7 @@ const UpcomingDashboard = () => {
             setSimResult({
                 basePrediction: { predictions: prediction.predictions },
                 scenarios: [{
-                    name: 'Modified Scenario',
+                    name: changeDescriptions.join(' + ') || 'Modified Scenario',
                     changes: { budget: simData.budget },
                     predictions: {
                         predictions: {
@@ -132,6 +164,52 @@ const UpcomingDashboard = () => {
             });
         } finally {
             setSimLoading(false);
+        }
+    };
+
+    const handleSimScriptUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Basic validation
+        const validTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!validTypes.includes(file.type)) {
+            alert('Please upload a PDF, TXT, or DOCX file.');
+            return;
+        }
+
+        setSimScriptFile(file);
+        setUploadingSimScript(true);
+
+        try {
+            const response = await scriptService.analyze(file);
+            const data = response.data;
+            
+            if (data.success && data.analysis) {
+                setSimScriptScore(data.analysis);
+                
+                // Auto-fill Genres based on Gemini's genre_prediction for Simulation Data
+                if (data.analysis.genre_prediction && Array.isArray(data.analysis.genre_prediction)) {
+                    const extractedGenres = data.analysis.genre_prediction
+                        .map(g => g.split('/')[0].trim()) 
+                        .filter(g => genres.includes(g)); 
+                    
+                    if (extractedGenres.length > 0) {
+                        setSimData(prev => ({
+                            ...prev,
+                            // Replace genres entirely or add? For simulation, mostly we replace to test new idea
+                            genres: [...new Set([...prev.genres, ...extractedGenres])]
+                        }));
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Simulation Script analysis failed:', error);
+            alert(error.response?.data?.error || 'Failed to analyze script. Proceeding without script insights.');
+            setSimScriptScore(null);
+            setSimScriptFile(null);
+        } finally {
+            setUploadingSimScript(false);
         }
     };
 
@@ -385,6 +463,53 @@ const UpcomingDashboard = () => {
         }));
     };
 
+    const handleScriptUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Basic validation
+        const validTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!validTypes.includes(file.type)) {
+            alert('Please upload a PDF, TXT, or DOCX file.');
+            return;
+        }
+
+        setScriptFile(file);
+        setUploadingScript(true);
+
+        try {
+            const response = await scriptService.analyze(file);
+            const data = response.data;
+            
+            if (data.success && data.analysis) {
+                setScriptScore(data.analysis);
+                
+                // Auto-fill Genres based on Gemini's genre_prediction
+                if (data.analysis.genre_prediction && Array.isArray(data.analysis.genre_prediction)) {
+                    // Map Gemini's genres to our predefined list, falling back if no exact match
+                    const extractedGenres = data.analysis.genre_prediction
+                        .map(g => g.split('/')[0].trim()) // Sometimes it says "Action/Adventure"
+                        .filter(g => genres.includes(g)); 
+                    
+                    if (extractedGenres.length > 0) {
+                        setFormData(prev => ({
+                            ...prev,
+                            // Set genres to unique combination of existing + extracted
+                            genres: [...new Set([...prev.genres, ...extractedGenres])]
+                        }));
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Script analysis failed:', error);
+            alert(error.response?.data?.error || 'Failed to analyze script. Proceeding without script insights.');
+            setScriptScore(null);
+            setScriptFile(null);
+        } finally {
+            setUploadingScript(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -441,7 +566,8 @@ const UpcomingDashboard = () => {
                     { feature: 'Sequel/Franchise', value: formData.isSequel ? 'Yes' : 'No', impact: 0.10 },
                     { feature: 'Pre-release Buzz', value: formData.trailerViews || 0, impact: 0.09 }
                 ]
-            }
+            },
+            scriptAnalysis: scriptScore // Add script insights to demo prediction too
         };
     };
 
@@ -462,7 +588,7 @@ const UpcomingDashboard = () => {
     };
 
     return (
-        <div className="upcoming-dashboard">
+        <div className="upcoming-dashboard" id="top">
             {/* Header */}
             <section className="dashboard-header">
                 <div className="dashboard-header-bg"></div>
@@ -513,6 +639,54 @@ const UpcomingDashboard = () => {
                                 >
                                     <h2 className="card-title">Movie Details</h2>
                                     <form onSubmit={handleSubmit} className="predict-form">
+                                        {/* Optional Script Upload */}
+                                        <div className="form-section script-upload-section">
+                                            <h3 className="form-section-title">
+                                                <span className="sparkle-icon">✨</span> Automate with AI Script Analysis
+                                            </h3>
+                                            <p className="section-description" style={{ fontSize: '0.9rem', color: '#888', marginBottom: '15px' }}>
+                                                Upload your script to auto-detect genres and receive a qualitative story score alongside your financial prediction.
+                                            </p>
+                                            
+                                            <div 
+                                                className={`sa-dropzone ${isDraggingPredict ? 'dragging' : ''} ${scriptFile ? 'has-file' : ''}`}
+                                                onDragOver={handleDragOverPredict}
+                                                onDragLeave={handleDragLeavePredict}
+                                                onDrop={handleDropPredict}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    id="script-upload-predict"
+                                                    className="script-file-input"
+                                                    accept=".pdf,.txt,.doc,.docx"
+                                                    onChange={handleScriptUpload}
+                                                    disabled={uploadingScript}
+                                                    hidden
+                                                />
+                                                <label htmlFor="script-upload-predict" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', margin: 0 }}>
+                                                    {uploadingScript ? (
+                                                        <div className="sa-loading-hint">
+                                                            <span className="sa-spinner" style={{ marginBottom: '10px' }}></span>
+                                                            <p style={{ margin: 0 }}>Gemini AI is analyzing your script...</p>
+                                                            <p className="sa-drop-subtext" style={{ marginTop: '5px' }}>This may take up to 60 seconds.</p>
+                                                        </div>
+                                                    ) : scriptFile ? (
+                                                        <div className="sa-file-info" style={{ flexDirection: 'column', gap: '8px' }}>
+                                                            <span className="sa-file-icon">📄</span>
+                                                            <span className="sa-file-name">{scriptFile.name}</span>
+                                                            <span className="sa-file-size" style={{color: '#00c853'}}>✓ Analysis Complete! Click to replace</span>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <span className="sa-drop-icon">📜</span>
+                                                            <p className="sa-drop-text">Drag & drop your script here</p>
+                                                            <p className="sa-drop-subtext">or click to browse · PDF, TXT, DOCX · Max 10 MB</p>
+                                                        </>
+                                                    )}
+                                                </label>
+                                            </div>
+                                        </div>
+
                                         {/* Basic Info */}
                                         <div className="form-section">
                                             <h3 className="form-section-title">Basic Information</h3>
@@ -738,54 +912,100 @@ const UpcomingDashboard = () => {
                                         <div className="results-card glass-card">
                                             <h2 className="card-title">Prediction Results</h2>
 
-                                            {/* Main Prediction */}
-                                            <div className="prediction-main">
-                                                <div className="prediction-category">
-                                                    <span className={`category-label ${getCategoryClass(prediction.predictions?.successCategory)}`}>
-                                                        {prediction.predictions?.successCategory || 'Processing...'}
-                                                    </span>
-                                                    <span className="confidence-label">
-                                                        {prediction.predictions?.confidence || 0}% Confidence
-                                                    </span>
+                                            {/* Top Section: Dual Engine Results */}
+                                            <div className="dual-engine-results" style={{ display: 'flex', gap: '20px', flexDirection: window.innerWidth < 768 ? 'column' : 'row' }}>
+                                                
+                                                {/* Left: ML Data Prediction */}
+                                                <div className="prediction-main flex-1" style={{ flex: scriptScore ? '1.5' : '1' }}>
+                                                    <h3 className="section-subtitle" style={{ fontSize: '1rem', marginBottom: '15px', color: '#888' }}>📊 Data Model Prediction</h3>
+                                                    <div className="prediction-category" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                                        <span className={`category-label ${getCategoryClass(prediction.predictions?.successCategory)}`}>
+                                                            {prediction.predictions?.successCategory || 'Processing...'}
+                                                        </span>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                            <div style={{ position: 'relative', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <svg viewBox="0 0 36 36" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                                                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+                                                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-orange)" strokeWidth="3" strokeDasharray={`${prediction.predictions?.confidence || 0}, 100`} style={{ transition: 'stroke-dasharray 1s ease-out' }} />
+                                                                </svg>
+                                                                <span style={{ fontSize: '0.75rem', fontWeight: 'bold', zIndex: 1, fontFamily: 'Syne, sans-serif' }}>
+                                                                    {prediction.predictions?.confidence || 0}%
+                                                                </span>
+                                                            </div>
+                                                            <span style={{ fontSize: '0.9rem', color: '#888' }}>Confidence</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="prediction-metrics">
+                                                        <div className="metric-card">
+                                                            <span className="metric-icon">💰</span>
+                                                            <div className="metric-info">
+                                                                <span className="metric-value">
+                                                                    {formatCurrency(prediction.predictions?.predictedRevenue)}
+                                                                </span>
+                                                                <span className="metric-label">Predicted Revenue <span className="tooltip-icon" data-tooltip="Estimated global box office gross. Break-even translates to approx 2.5x production budget.">?</span></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="metric-card">
+                                                            <span className="metric-icon">⭐</span>
+                                                            <div className="metric-info">
+                                                                <span className="metric-value">
+                                                                    {prediction.predictions?.confidence ? (Math.min(prediction.predictions.confidence / 10, 10)).toFixed(1) : 'N/A'}/10
+                                                                </span>
+                                                                <span className="metric-label">Predicted Rating <span className="tooltip-icon" data-tooltip="Estimated IMDb/Audience score out of 10 based on similar features.">?</span></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="metric-card">
+                                                            <span className="metric-icon">📈</span>
+                                                            <div className="metric-info">
+                                                                <span className={`metric-value ${(prediction.predictions?.predictedROI || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
+                                                                    {(prediction.predictions?.predictedROI || 0) >= 0 ? '+' : ''}{Math.round(prediction.predictions?.predictedROI || 0)}%
+                                                                </span>
+                                                                <span className="metric-label">Predicted ROI <span className="tooltip-icon" data-tooltip="Return on production budget. Warning: positive ROI doesn't mean net profit after marketing and theater cuts.">?</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                <div className="prediction-metrics">
-                                                    <div className="metric-card">
-                                                        <span className="metric-icon">💰</span>
-                                                        <div className="metric-info">
-                                                            <span className="metric-value">
-                                                                {formatCurrency(prediction.predictions?.predictedRevenue)}
-                                                            </span>
-                                                            <span className="metric-label">Predicted Revenue</span>
+                                                {/* Right: AI Script Insights (If Available) */}
+                                                {scriptScore && (
+                                                    <div className="ai-magic-card">
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+                                                            <span className="sparkle-icon">✨</span>
+                                                            <h3 className="section-subtitle" style={{ fontSize: '1rem', margin: 0, color: '#ff4d00', zIndex: 2 }}>Gemini Script Score</h3>
                                                         </div>
-                                                    </div>
 
-                                                    <div className="metric-card">
-                                                        <span className="metric-icon">⭐</span>
-                                                        <div className="metric-info">
-                                                            <span className="metric-value">
-                                                                {prediction.predictions?.confidence ? (Math.min(prediction.predictions.confidence / 10, 10)).toFixed(1) : 'N/A'}/10
-                                                            </span>
-                                                            <span className="metric-label">Predicted Rating</span>
+                                                        <div className="script-score-circle" style={{ textAlign: 'center', marginBottom: '15px', zIndex: 2, position: 'relative' }}>
+                                                            <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#fff' }}>
+                                                                {scriptScore.overall_score}<span style={{ fontSize: '1rem', color: '#888' }}>/10</span>
+                                                            </div>
+                                                            <div style={{ fontSize: '0.85rem', color: '#aaa', marginTop: '5px' }}>Overall Story Quality</div>
                                                         </div>
-                                                    </div>
 
-                                                    <div className="metric-card">
-                                                        <span className="metric-icon">📈</span>
-                                                        <div className="metric-info">
-                                                            <span className={`metric-value ${(prediction.predictions?.predictedROI || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-                                                                {(prediction.predictions?.predictedROI || 0) >= 0 ? '+' : ''}{Math.round(prediction.predictions?.predictedROI || 0)}%
-                                                            </span>
-                                                            <span className="metric-label">Predicted ROI</span>
+                                                        <div className="script-commercial-potential" style={{ background: 'rgba(0,0,0,0.3)', padding: '15px', borderRadius: '12px', zIndex: 2, position: 'relative' }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                                                                <span style={{ color: '#888', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                                                                    Commercial Potential:
+                                                                    <span className="tooltip-icon" data-tooltip="AI's assessment of marketability based on themes, genre, and audience trends." style={{ marginLeft: '4px' }}>?</span>
+                                                                </span>
+                                                                <strong className={scriptScore.success_indicators?.commercial_potential === 'High' ? 'text-success' : scriptScore.success_indicators?.commercial_potential === 'Medium' ? 'text-warning' : 'text-danger'}>
+                                                                    {scriptScore.success_indicators?.commercial_potential}
+                                                                </strong>
+                                                            </div>
+                                                            <p style={{ fontSize: '0.85rem', color: '#bbb', lineHeight: '1.4', margin: 0 }}>
+                                                                {scriptScore.success_indicators?.reasoning}
+                                                            </p>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                )}
                                             </div>
 
                                             {/* Feature Importance */}
                                             {prediction.predictions?.featureImportance && (
-                                                <div className="feature-importance-section">
-                                                    <h3 className="section-subtitle">Why This Prediction? (XAI)</h3>
+                                                <div className="feature-importance-section" style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <h3 className="section-subtitle">Why This Prediction? (ML Explainability)</h3>
                                                     <div className="feature-list">
                                                         {prediction.predictions.featureImportance.map((feature, idx) => (
                                                             <div key={idx} className="feature-item">
@@ -839,7 +1059,7 @@ const UpcomingDashboard = () => {
                                     <button
                                         className="btn btn-primary"
                                         onClick={() => setActiveSection('predict')}
-                                        style={{ marginTop: '20px', padding: '14px 32px' }}
+                                        style={{ marginTop: '20px', padding: '14px 32px', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}
                                     >
                                         Go to Predict Tab →
                                     </button>
@@ -854,6 +1074,53 @@ const UpcomingDashboard = () => {
                                         </p>
 
                                         <div className="sim-form">
+                                            {/* Optional Sim Script Upload */}
+                                            <div className="sim-control-group" style={{ marginBottom: '20px' }}>
+                                                <label className="form-label">
+                                                    ✨ Upload Updated Script
+                                                    {simScriptScore && (
+                                                        <span className="sim-changed-badge" style={{ backgroundColor: '#ff4d00' }}>AI Analyzed</span>
+                                                    )}
+                                                </label>
+                                                <div 
+                                                    className={`sa-dropzone ${isDraggingSim ? 'dragging' : ''} ${simScriptFile ? 'has-file' : ''}`}
+                                                    style={{ padding: '30px 20px', background: 'rgba(0,0,0,0.2)' }}
+                                                    onDragOver={handleDragOverSim}
+                                                    onDragLeave={handleDragLeaveSim}
+                                                    onDrop={handleDropSim}
+                                                >
+                                                    <input
+                                                        type="file"
+                                                        id="script-upload-simulate"
+                                                        className="script-file-input"
+                                                        accept=".pdf,.txt,.doc,.docx"
+                                                        onChange={handleSimScriptUpload}
+                                                        disabled={uploadingSimScript}
+                                                        hidden
+                                                    />
+                                                    <label htmlFor="script-upload-simulate" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', margin: 0 }}>
+                                                        {uploadingSimScript ? (
+                                                            <div className="sa-loading-hint">
+                                                                <span className="sa-spinner" style={{ marginBottom: '10px', width: '20px', height: '20px' }}></span>
+                                                                <p style={{ fontSize: '0.9rem', margin: 0 }}>Analyzing... <small>Wait 60s</small></p>
+                                                            </div>
+                                                        ) : simScriptFile ? (
+                                                            <div className="sa-file-info" style={{ flexDirection: 'column', gap: '5px' }}>
+                                                                <span className="sa-file-icon" style={{ fontSize: '1.5rem' }}>📄</span>
+                                                                <span className="sa-file-name" style={{ fontSize: '0.9rem', textAlign: 'center' }}>{simScriptFile.name}</span>
+                                                                {simScriptScore && <span className="sa-file-size" style={{color: '#00c853'}}>✓ Score: {simScriptScore.overall_score}/10</span>}
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <span className="sa-drop-icon" style={{ fontSize: '2rem', marginBottom: '10px' }}>📜</span>
+                                                                <p className="sa-drop-text" style={{ fontSize: '0.95rem' }}>Drag & drop script</p>
+                                                                <p className="sa-drop-subtext" style={{ fontSize: '0.8rem' }}>PDF, TXT, DOCX</p>
+                                                            </>
+                                                        )}
+                                                    </label>
+                                                </div>
+                                            </div>
+
                                             {/* Budget */}
                                             <div className="sim-control-group">
                                                 <label className="form-label">
@@ -994,7 +1261,7 @@ const UpcomingDashboard = () => {
                                                     {/* Comparison Cards */}
                                                     <div className="sim-comparison">
                                                         {/* Original */}
-                                                        <div className="sim-compare-card sim-original">
+                                                        <div className="sim-compare-card sim-original" style={{ position: 'relative' }}>
                                                             <h4>Original</h4>
                                                             <div className={`sim-category ${getCategoryClass(prediction.predictions?.successCategory)}`}>
                                                                 {prediction.predictions?.successCategory || 'N/A'}
@@ -1011,6 +1278,14 @@ const UpcomingDashboard = () => {
                                                                         : 'N/A'}
                                                                 </span>
                                                             </div>
+                                                            
+                                                            {/* Original Script Score if any */}
+                                                            <div className="sim-stat" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                <span className="sim-stat-label">Script Score</span>
+                                                                <span className="sim-stat-value" style={{ color: scriptScore ? '#fff' : '#888' }}>
+                                                                    {scriptScore ? `${scriptScore.overall_score}/10` : 'None'}
+                                                                </span>
+                                                            </div>
                                                         </div>
 
                                                         {/* Arrow */}
@@ -1022,8 +1297,11 @@ const UpcomingDashboard = () => {
                                                             const baseRev = prediction.predictions?.predictedRevenue || 0;
                                                             const modRev = mod?.predictedRevenue || 0;
                                                             const revDelta = baseRev > 0 ? ((modRev - baseRev) / baseRev * 100) : 0;
+                                                            
+                                                            const currentScriptScore = simScriptScore || scriptScore;
+                                                            
                                                             return (
-                                                                <div className="sim-compare-card sim-modified">
+                                                                <div className="sim-compare-card sim-modified" style={{ position: 'relative' }}>
                                                                     <h4>Modified</h4>
                                                                     <div className={`sim-category ${getCategoryClass(mod?.successCategory)}`}>
                                                                         {mod?.successCategory || 'N/A'}
@@ -1041,6 +1319,15 @@ const UpcomingDashboard = () => {
                                                                         <span className="sim-stat-label">ROI</span>
                                                                         <span className="sim-stat-value">
                                                                             {mod?.predictedROI != null ? `${Math.round(mod.predictedROI)}%` : 'N/A'}
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    {/* Modified Script Score */}
+                                                                    <div className="sim-stat" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                        <span className="sim-stat-label">Script Score</span>
+                                                                        <span className="sim-stat-value" style={{ color: currentScriptScore ? (simScriptScore ? '#ff4d00' : '#fff') : '#888' }}>
+                                                                            {currentScriptScore ? `${currentScriptScore.overall_score}/10` : 'None'}
+                                                                            {simScriptScore && <span className="sim-delta positive" style={{ marginLeft: '5px' }}>✨ New</span>}
                                                                         </span>
                                                                     </div>
                                                                 </div>

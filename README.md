@@ -140,7 +140,20 @@ npm run dev
 
 ---
 
-### Step 5: Open the App
+### Step 4: Verification (Second Device Checklist)
+
+To verify the setup on a second device:
+1.  **IP Whitelisting**: Ensure your current IP is whitelisted in [MongoDB Atlas](https://cloud.mongodb.com/). 
+    - Database Access -> Network Access -> Add IP Address.
+2.  **ML Service Connectivity**:
+    - Ensure `ml-service/app.py` is running.
+    - Check that `server/.env` has the correct `ML_SERVICE_URL`.
+3.  **Ports Check**: Ensure ports 5173 (Vite), 5000 (Express), and 5001 (Flask) are not blocked by the firewall.
+4.  **Data Fetch**: Open the app and go to "Released Movies". If data appears, connection is successful.
+
+---
+
+### Step 5: Start All Servers (Development)
 
 Visit: **http://localhost:5173**
 

@@ -21,6 +21,7 @@ export const movieService = {
   getUpcoming: (params = {}) => api.get('/movies/upcoming', { params }),
   getSimilar: (id) => api.get(`/movies/${id}/similar`),
   getStats: (industry) => api.get('/movies/stats/overview', { params: { industry } }),
+  recommend: (data) => api.post('/movies/recommend', data),
 };
 
 // Predictions API
@@ -52,6 +53,18 @@ export const talentsService = {
   getDirector: (id) => api.get(`/talents/director/${id}`),
   getActor: (id) => api.get(`/talents/actor/${id}`),
   getCastScore: (actorIds) => api.post('/talents/cast-score', { actorIds }),
+};
+
+// Script Analysis API
+export const scriptService = {
+  analyze: (file) => {
+    const formData = new FormData();
+    formData.append('script', file);
+    return api.post('/scripts/analyze', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000, // 2 minute timeout for AI processing
+    });
+  },
 };
 
 export default api;

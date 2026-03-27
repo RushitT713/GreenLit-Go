@@ -89,11 +89,16 @@ const Home = () => {
             icon: '📈',
             title: 'Trend Analytics',
             description: 'Genre trends, seasonal patterns, and industry insights through interactive dashboards.'
+        },
+        {
+            icon: '✨',
+            title: 'Script Analysis',
+            description: 'Analyze screenplays for narrative pacing, character arcs, and commercial viability using Gemini AI.'
         }
     ];
 
-    const row1 = capabilities.slice(0, 5);
-    const row2 = capabilities.slice(5);
+    const row1 = capabilities.slice(0, 6);
+    const row2 = capabilities.slice(6);
 
     // Scroll Reveal Animation using Intersection Observer
     useEffect(() => {

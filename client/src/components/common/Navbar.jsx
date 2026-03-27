@@ -13,6 +13,7 @@ const Navbar = () => {
         { name: 'Released Movies', path: '/movies' },
         { name: 'Insights', path: '/insights' },
         { name: 'Upcoming Movies', path: '/upcoming' },
+        { name: 'Script Analysis', path: '/analysis' },
         { name: 'About Us', path: '/about' }
     ];
 

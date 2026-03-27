@@ -305,7 +305,7 @@ const About = () => {
                         Start predicting movie success with our data-driven analytics platform.
                     </p>
                     <div className="about-cta-buttons">
-                        <button className="about-cta-btn primary" onClick={() => navigate('/upcoming')}>
+                        <button className="about-cta-btn primary" onClick={() => navigate('/upcoming#top')}>
                             Get Started
                         </button>
                         <button className="about-cta-btn secondary" onClick={() => navigate('/library')}>
