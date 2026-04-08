@@ -5,27 +5,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap');
 
 @font-face {
-  font-family: 'TT Firs Neue';
-  src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'TT Firs Neue';
-  src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'TT Firs Neue';
-  src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'TT Firs Neue';
+    src: url('/fonts/TT Firs Neue Trial Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 

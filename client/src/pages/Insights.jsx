@@ -19,9 +19,12 @@ const fmtShort = (v) => {
 };
 
 const CATEGORY_COLORS = {
-    Blockbuster: '#ffa500', 'Super Hit': '#22c55e', Hit: '#3b82f6',
-    Average: '#f97316', 'Below Average': '#ef4444', Flop: '#dc2626',
-    Disaster: '#991b1b', Unknown: '#666'
+    'Blockbuster': '#ffa500', 
+    'Super Hit': '#22c55e', 
+    'Hit': '#3b82f6',
+    'Average': '#f97316', 
+    'Flop': '#ef4444', 
+    'Unknown': '#666'
 };
 
 // ── Shared ApexCharts dark theme ─────────────────────
@@ -445,7 +448,6 @@ const Insights = () => {
         options: {
             chart: { ...darkChart, type: 'bar', height: 380 },
             theme: darkTheme,
-            colors: ['#ff4d00'],
             plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '65%', distributed: true } },
             xaxis: { labels: { formatter: fmt, style: { colors: '#666' } } },
             yaxis: { labels: { style: { colors: '#999', fontSize: '12px', fontFamily: "'Work Sans', sans-serif" } } },
@@ -464,7 +466,6 @@ const Insights = () => {
         options: {
             chart: { ...darkChart, type: 'bar', height: 380 },
             theme: darkTheme,
-            colors: ['#3b82f6'],
             plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '65%', distributed: true } },
             xaxis: { labels: { formatter: fmt, style: { colors: '#666' } } },
             yaxis: { labels: { style: { colors: '#999', fontSize: '12px', fontFamily: "'Work Sans', sans-serif" } } },
@@ -524,7 +525,6 @@ const Insights = () => {
         options: {
             chart: { ...darkChart, type: 'bar', height: 420 },
             theme: darkTheme,
-            colors: ['#ff4d00'],
             plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '62%', distributed: true } },
             xaxis: { labels: { formatter: fmt, style: { colors: '#666' } } },
             yaxis: { labels: { style: { colors: '#999', fontSize: '11px', fontFamily: "'Work Sans', sans-serif" } } },
@@ -663,7 +663,7 @@ const Insights = () => {
                             Data <span className="text-gradient">Insights</span>
                         </h1>
                         <p className="insights-subtitle">
-                            Explore trends, patterns, and analytics across 1,600+ movies from Hollywood and Indian cinema
+                            Explore trends, patterns, and analytics across 4,000+ movies from Hollywood and Indian cinema
                         </p>
                         <div className="industry-filter">
                             {industries.map(ind => (

@@ -693,9 +693,12 @@
     font-weight: 600;
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 1024px) {
     .predict-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sim-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1574,7 +1577,9 @@
 }
 
 @keyframes sa-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .sa-loading-hint {
@@ -1587,8 +1592,15 @@
 }
 
 @keyframes sa-pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 /* ─── UI Enhancements: AI Magic Card & Tooltips ─── */
@@ -1605,8 +1617,9 @@
     position: absolute;
     inset: 0;
     border-radius: 16px;
-    padding: 2px; /* border thickness */
-    background: linear-gradient(135deg, rgba(255,77,0,0.8), rgba(255,165,0,0.4), rgba(255,77,0,0.1));
+    padding: 2px;
+    /* border thickness */
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.8), rgba(255, 165, 0, 0.4), rgba(255, 77, 0, 0.1));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -1616,9 +1629,17 @@
 }
 
 @keyframes magic-border-pulse {
-    0% { filter: hue-rotate(0deg) brightness(1); }
-    50% { filter: hue-rotate(30deg) brightness(1.5); }
-    100% { filter: hue-rotate(0deg) brightness(1); }
+    0% {
+        filter: hue-rotate(0deg) brightness(1);
+    }
+
+    50% {
+        filter: hue-rotate(30deg) brightness(1.5);
+    }
+
+    100% {
+        filter: hue-rotate(0deg) brightness(1);
+    }
 }
 
 .tooltip-icon {
@@ -1666,4 +1687,202 @@
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
+}
+
+/* ─── Skeleton Loaders ─── */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton {
+    background: #1a1a1a;
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(255, 255, 255, 0.08) 37%,
+        rgba(255, 255, 255, 0.03) 63%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: 8px;
+}
+
+.skeleton-text {
+    height: 16px;
+    margin-bottom: 12px;
+}
+
+.skeleton-text.large {
+    height: 32px;
+}
+
+.skeleton-text.medium {
+    height: 24px;
+}
+
+.skeleton-box {
+    height: 120px;
+    width: 100%;
+}
+
+.skeleton-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+/* ─── Skeleton Predict UI Structure ─── */
+.skeleton-dashboard-card {
+    padding: 20px;
+}
+
+.skeleton-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.skeleton-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+/* ─── Finalize Project / Schedule Modal ─── */
+.schedule-actions-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-header h3 {
+    font-family: 'Syne', sans-serif;
+    color: #fff;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.export-pdf-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.export-pdf-btn:hover {
+    background: #2a2a2a;
+    border-color: #555;
+    color: var(--accent-orange);
+}
+
+.schedule-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: rgba(255, 77, 0, 0.03);
+    border: 1px solid rgba(255, 77, 0, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.date-picker-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.date-picker-wrap label {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.date-picker-input {
+    background: #000;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.date-picker-input:focus {
+    border-color: var(--accent-orange);
+    background: #0a0a0a;
+}
+
+/* Chrome / Edge specific dark styling for date picker */
+.date-picker-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.date-picker-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+.btn-schedule {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+    color: #000;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px; /* align with input */
+}
+
+.btn-schedule:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 77, 0, 0.3);
+}
+
+.btn-schedule:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #333;
+    color: #888;
 }

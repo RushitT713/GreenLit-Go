@@ -632,4 +632,49 @@ router.post('/recommend', async (req, res) => {
   }
 });
 
+// POST /api/movies/schedule
+// Save a newly simulated movie into the Upcoming Dashboard
+router.post('/schedule', async (req, res) => {
+  try {
+    const { 
+      title, 
+      genres, 
+      budget, 
+      industry, 
+      directorName, 
+      releaseMonth,
+      targetReleaseDate,
+      isSequel,
+      productionCompany,
+      predictions 
+    } = req.body;
+    
+    if (!title || !targetReleaseDate) {
+      return res.status(400).json({ error: 'Title and targetReleaseDate are required' });
+    }
+
+    const movie = new Movie({
+      title,
+      genres,
+      budget,
+      industry: industry || 'hollywood',
+      status: 'Upcoming',
+      releaseDate: new Date(targetReleaseDate),
+      isSequel: isSequel || false,
+      productionCompanies: productionCompany ? [{ name: productionCompany }] : [],
+      director: directorName ? { name: directorName } : undefined,
+      predictions: {
+        ...predictions,
+        lastUpdated: new Date()
+      }
+    });
+
+    await movie.save();
+    res.status(201).json({ success: true, message: 'Movie scheduled successfully!', movie });
+  } catch (error) {
+    console.error('Failed to schedule movie:', error);
+    res.status(500).json({ error: 'Failed to schedule movie' });
+  }
+});
+
 module.exports = router;

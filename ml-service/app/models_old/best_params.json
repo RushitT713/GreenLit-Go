@@ -1,0 +1,43 @@
+{
+  "rf_regressor": {
+    "n_estimators": 200,
+    "max_depth": 14,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "max_features": null
+  },
+  "xgb_regressor": {
+    "n_estimators": 450,
+    "max_depth": 7,
+    "learning_rate": 0.03389190835613468,
+    "subsample": 0.9122932669816438,
+    "colsample_bytree": 0.7486213276231132,
+    "reg_alpha": 0.00011104342890887509,
+    "reg_lambda": 1.3590511346930905
+  },
+  "lgbm_regressor": {
+    "n_estimators": 300,
+    "max_depth": 7,
+    "learning_rate": 0.018455984470033614,
+    "num_leaves": 30,
+    "subsample": 0.7280963097136981,
+    "colsample_bytree": 0.9618401638784558,
+    "reg_alpha": 1.1659791237677309e-08,
+    "reg_lambda": 1.7636561206067246e-05
+  },
+  "xgb_classifier": {
+    "n_estimators": 150,
+    "max_depth": 6,
+    "learning_rate": 0.056705071311192234,
+    "subsample": 0.8722613792372554,
+    "colsample_bytree": 0.9979572330611937
+  },
+  "lgbm_classifier": {
+    "n_estimators": 150,
+    "max_depth": 8,
+    "learning_rate": 0.035021766745606524,
+    "num_leaves": 38,
+    "subsample": 0.6105724011783839,
+    "colsample_bytree": 0.7887735968352452
+  }
+}

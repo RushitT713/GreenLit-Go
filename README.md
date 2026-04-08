@@ -1,13 +1,14 @@
 # 🎬 GreenLit GO — Movie Success Prediction Platform
 
-An ML-powered full-stack web application that predicts movie box office success before release, using ensemble learning (RandomForest + XGBoost + LightGBM) with SHAP explainability.
+An ML-powered full-stack web application that predicts movie box office success before release, using a Stacking Ensemble (RandomForest, XGBoost, LightGBM, KNN + RidgeCV Meta-learner) trained on **2,180 curated movies**, with SHAP explainability.
 
 ---
 
 ## ✨ Features
 
-- **Revenue Prediction** — Predicts box office gross with R² = 0.934
-- **Success Classification** — Categorizes movies: Blockbuster, Super Hit, Hit, Average, Flop
+- **Revenue Prediction** — Predicts box office gross with R² = 0.7504 across 46 engineered features
+- **Success Classification** — Categorizes movies (Blockbuster to Flop) with 62.39% Accuracy
+- **Script Analysis (LLM)** — Upload screenplay PDFs for Generative AI (Google Gemini 2.5 Flash) insights on plot, tone, and pacing.
 - **Explainable AI** — SHAP-powered feature attribution for every prediction
 - **Insights Dashboard** — 8+ interactive charts for industry trend analysis
 - **What-If Simulation** — Tweak inputs and see predictions change in real-time
@@ -72,6 +73,7 @@ MONGODB_URI=your_mongodb_atlas_connection_string
 TMDB_API_KEY=your_tmdb_api_key
 OMDB_API_KEY=your_omdb_api_key
 YOUTUBE_API_KEY=your_youtube_api_key
+GEMINI_API_KEY=your_gemini_api_key
 ML_SERVICE_URL=http://localhost:5001
 ```
 
@@ -79,6 +81,7 @@ ML_SERVICE_URL=http://localhost:5001
 > - **TMDB:** Sign up at [themoviedb.org](https://www.themoviedb.org/settings/api) → Settings → API
 > - **OMDB:** Get a free key at [omdbapi.com](http://www.omdbapi.com/apikey.aspx)
 > - **YouTube:** Create a project at [Google Cloud Console](https://console.cloud.google.com) → Enable YouTube Data API v3 → Create API Key
+> - **Gemini AI:** Get a free key from Google AI Studio at [aistudio.google.com](https://aistudio.google.com/)
 > - **MongoDB Atlas:** Get connection string from [MongoDB Atlas](https://cloud.mongodb.com) → Database → Connect
 
 ---
@@ -184,6 +187,9 @@ Visit: **http://localhost:5173**
 - `POST /competition` — Analyze competition in release window
 - `POST /whatif` — Run what-if simulation
 
+### Scripts API (`/api/scripts`)
+- `POST /analyze` — Upload PDF/TXT and extract script insights via Gemini 2.5 Flash
+
 ### Trends API (`/api/trends`)
 - `GET /yearly` — Yearly trends
 - `GET /genres` — Genre analysis
@@ -207,6 +213,7 @@ Visit: **http://localhost:5173**
 | **OMDB API** | IMDb ratings, Metascore, Rotten Tomatoes scores |
 | **YouTube API** | Trailer views, likes, comments, engagement |
 | **Box Office Mojo** | Opening weekend grosses (web scraping) |
+| **LLM (Gemini)** | Post-upload script analysis from native PDFs |
 
 ---
 
@@ -215,7 +222,7 @@ Visit: **http://localhost:5173**
 | Layer | Technologies |
 |-------|-------------|
 | **Frontend** | React 19, Vite, React Router, ApexCharts, Framer Motion, Lucide Icons |
-| **Backend** | Node.js, Express 4, Mongoose, Axios |
+| **Backend** | Node.js, Express 4, Mongoose, Axios, Google Generative AI (Gemini), pdf-parse |
 | **ML Service** | Python, Flask, Scikit-learn, XGBoost, LightGBM, Optuna, SHAP |
 | **Database** | MongoDB Atlas (cloud) |
 | **Data Collection** | Python, BeautifulSoup, Requests, Pandas |

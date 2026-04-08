@@ -11,7 +11,7 @@ const About = () => {
     const stats = [
         {
             icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8300" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2" /><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 7h5M17 17h5" /></svg>,
-            value: '1,600+', label: 'Movies Analyzed'
+            value: '4,000+', label: 'Movies Analyzed'
         },
         {
             icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8300" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg>,
@@ -19,11 +19,11 @@ const About = () => {
         },
         {
             icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8300" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" /><path d="M10 21h4M10 17v-1a2 2 0 012-2h0a2 2 0 012 2v1" /></svg>,
-            value: '34', label: 'ML Features'
+            value: '46', label: 'ML Features'
         },
         {
             icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8300" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
-            value: '93%', label: 'Model Accuracy'
+            value: '75%', label: 'Model Accuracy'
         }
     ];
 
@@ -67,7 +67,7 @@ const About = () => {
     const capabilities = [
         {
             title: 'Revenue Prediction',
-            description: 'Predict box office gross using ensemble ML models trained on 1,600+ movies across multiple industries.'
+            description: 'Predict box office gross using ensemble ML models trained on 4,000+ movies across multiple industries.'
         },
         {
             title: 'Success Classification',
@@ -88,6 +88,10 @@ const About = () => {
         {
             title: 'What-If Simulator',
             description: 'Interactively tweak budget, genre, release month, and cast to see how predictions change in real-time.'
+        },
+        {
+            title: 'Script Analysis (LLM)',
+            description: 'Upload screenplay PDFs to receive AI-driven insights on plot, tone, pacing, and commercial viability using Google Gemini.'
         }
     ];
 
@@ -96,7 +100,7 @@ const About = () => {
         {
             name: 'Rushit Trambadia',
             role: 'ML & Backend Developer',
-            description: 'Built the machine learning pipeline, trained prediction models, and engineered 40+ features from multi-source movie data.',
+            description: 'Built the machine learning pipeline, trained prediction models, and engineered 46 features from multi-source movie data.',
             photo: rushitImg,
             github: '',
             linkedin: ''
@@ -164,7 +168,7 @@ const About = () => {
                         <p className="about-mission-desc">
                             We're building an intelligent platform that bridges the gap between
                             data science and the film industry. By analyzing historical performance
-                            data from over 1,600 movies, our ML models help filmmakers, producers,
+                            data from over 4,000 movies, our ML models help filmmakers, producers,
                             and studios make informed decisions — from choosing the right release
                             window to understanding which factors drive box office success.
                         </p>
@@ -305,10 +309,10 @@ const About = () => {
                         Start predicting movie success with our data-driven analytics platform.
                     </p>
                     <div className="about-cta-buttons">
-                        <button className="about-cta-btn primary" onClick={() => navigate('/upcoming#top')}>
+                        <button className="about-cta-btn primary" onClick={() => navigate('/upcoming')}>
                             Get Started
                         </button>
-                        <button className="about-cta-btn secondary" onClick={() => navigate('/library')}>
+                        <button className="about-cta-btn secondary" onClick={() => navigate('/movies')}>
                             View Library
                         </button>
                     </div>

@@ -250,8 +250,13 @@ class MoviePredictor:
         features['vote_count'] = self._safe_float(data.get('voteCount', 0), 0)
         features['popularity'] = self._safe_float(data.get('popularity', 0), 0)
         features['year'] = self._safe_int(data.get('year', 2026), 2026)
+
+        # ─── INFLATION ADJUSTMENT ─────────────
+        # Adjust budget to 2024 dollars for the model (3% annual)
+        features['budget_adjusted'] = features['budget'] * (1.03 ** (2024 - features['year']))
+        features['log_budget'] = np.log1p(features['budget'])
+        features['budget_per_minute'] = features['budget'] / max(features['runtime'], 60)
         
-        # Release month
         release_month = data.get('releaseMonth', 6)
         if isinstance(release_month, str) and release_month:
             months = {'January': 1, 'February': 2, 'March': 3, 'April': 4,
@@ -261,6 +266,11 @@ class MoviePredictor:
         else:
             release_month = self._safe_int(release_month, 6)
         features['release_month'] = release_month
+        features['release_quarter'] = (release_month - 1) // 3 + 1
+        
+        # Cyclic encoding for month
+        features['month_sin'] = np.sin(2 * np.pi * release_month / 12)
+        features['month_cos'] = np.cos(2 * np.pi * release_month / 12)
         
         # Seasonal indicators
         features['is_summer_release'] = 1 if release_month in [5, 6, 7, 8] else 0
@@ -288,6 +298,8 @@ class MoviePredictor:
             col_name = genre_mapping.get(genre)
             if col_name and col_name in features:
                 features[col_name] = 1
+                
+        features['genre_count'] = len(genres) if genres else 1
         
         # Industry features
         industry = data.get('industry', 'hollywood').lower()
@@ -305,17 +317,28 @@ class MoviePredictor:
         
         # Cast popularity - use TMDB popularity from talent search
         cast_pop = self._safe_float(data.get('castPopularity', 0))
+        cast_max_pop = 0
         # Also check if cast members were sent with individual popularity
         cast_members = data.get('castMembers', [])
         if isinstance(cast_members, list) and len(cast_members) > 0:
             pop_scores = [self._safe_float(m.get('popularity', 0)) for m in cast_members if isinstance(m, dict)]
             if pop_scores:
                 cast_pop = max(cast_pop, sum(pop_scores) / len(pop_scores))
+                cast_max_pop = max(pop_scores)
         # Also accept combined cast score (0-100 from TalentSearch)
         cast_score = self._safe_float(data.get('castScore', 0))
         if cast_score > 0 and cast_pop == 0:
             cast_pop = cast_score  # Use cast score as popularity proxy
+            cast_max_pop = cast_score
         features['cast_popularity'] = cast_pop
+        features['cast_max_popularity'] = cast_max_pop
+        
+        # Talent interaction features
+        features['budget_x_cast_pop'] = features['budget'] * features['cast_popularity']
+        features['talent_synergy'] = features['director_popularity'] * features['cast_popularity']
+        total_talent = max(features['director_popularity'] + features['cast_popularity'], 0.1)
+        features['budget_per_talent'] = features['budget'] / total_talent
+        features['log_budget_per_talent'] = np.log1p(features['budget_per_talent'])
         
         # Sequel
         is_sequel = data.get('isSequel', False)
@@ -365,6 +388,14 @@ class MoviePredictor:
             # Predict revenue (log-transformed)
             log_revenue_pred = self.revenue_model.predict(X_scaled)[0]
             revenue_pred = np.expm1(log_revenue_pred)  # Inverse log transform
+            
+            # Model outputs 2024 dollars because we trained on adjusted budgets and revenues
+            # We must deflate the prediction back down to the target year's nominal value
+            target_year = features.get('year', 2026)
+            if target_year != 2024:
+                # To go backwards in time (or forward), reverse the formula: 
+                # Target Nominal = 2024 Prediction / (1.03 ^ (2024 - Target Year))
+                revenue_pred = revenue_pred / (1.03 ** (2024 - target_year))
             
             # Ensure revenue is non-negative
             revenue_pred = max(revenue_pred, 0)
@@ -569,16 +600,26 @@ class MoviePredictor:
             # This makes the XAI unique for each movie input
             try:
                 feature_values = np.abs(X_scaled.ravel())
-                contributions = global_importances * feature_values
                 
-                # Normalize to sum to 1.0
-                total_contribution = contributions.sum()
-                if total_contribution > 0:
-                    normalized = contributions / total_contribution
+                # Check for length mismatch (which causes the SHAP crash)
+                if len(feature_values) == len(global_importances):
+                    contributions = global_importances * feature_values
+                    
+                    # Normalize to sum to 1.0
+                    total_contribution = contributions.sum()
+                    if total_contribution > 0:
+                        normalized = contributions / total_contribution
+                    else:
+                        total = global_importances.sum()
+                        normalized = global_importances / total if total > 0 else global_importances
                 else:
+                    # Mismatch! Fall back safely.  Model might have been trained with 47
+                    # but predictor init might still have old 34-feature list attached
+                    print(f"Warning: feature vector len {len(feature_values)} != importance len {len(global_importances)}")
                     total = global_importances.sum()
                     normalized = global_importances / total if total > 0 else global_importances
-            except Exception:
+            except Exception as e:
+                print(f"Feature importance error: {e}")
                 # Fallback to global importances
                 total = global_importances.sum()
                 normalized = global_importances / total if total > 0 else global_importances

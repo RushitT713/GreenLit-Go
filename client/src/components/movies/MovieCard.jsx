@@ -11,7 +11,8 @@ const MovieCard = ({ movie }) => {
     const getCategoryClass = (category) => {
         if (!category) return '';
         const normalized = category.toLowerCase().replace(/\s+/g, '-');
-        if (['blockbuster', 'super-hit'].includes(normalized)) return 'blockbuster';
+        if (normalized === 'blockbuster') return 'blockbuster';
+        if (normalized === 'super-hit') return 'super-hit';
         if (normalized === 'hit') return 'hit';
         if (normalized === 'average') return 'average';
         return 'flop';

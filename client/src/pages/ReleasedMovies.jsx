@@ -60,7 +60,7 @@ const ReleasedMovies = () => {
 
     const industries = ['All', 'Hollywood', 'Bollywood', 'Tollywood', 'Kollywood', 'Mollywood'];
     const genres = ['All', 'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Drama', 'Horror', 'Romance', 'Sci-Fi', 'Thriller'];
-    const categories = ['All', 'Blockbuster', 'Hit', 'Average', 'Flop'];
+    const categories = ['All', 'Blockbuster', 'Super Hit', 'Hit', 'Average', 'Flop'];
     const sortOptions = [
         { value: 'popularity', label: 'Most Popular' },
         { value: 'voteAverage', label: 'Highest Rated' },

@@ -35,15 +35,15 @@ const Home = () => {
     const statsRef = useRef(null);
 
     // Counter values
-    const moviesCount = useCountUp(1600, 2000, statsVisible);
-    const accuracyCount = useCountUp(93, 2000, statsVisible);
+    const moviesCount = useCountUp(4000, 2000, statsVisible);
+    const accuracyCount = useCountUp(75, 2000, statsVisible);
     const industriesCount = useCountUp(5, 1500, statsVisible);
 
     const capabilities = [
         {
             icon: '💰',
             title: 'Revenue Prediction',
-            description: 'Predict box office gross with ML models trained on 1,600+ movies across multiple industries.'
+            description: 'Predict box office gross with ML models trained on 4,000+ movies across multiple industries.'
         },
         {
             icon: '📊',

@@ -22,6 +22,7 @@ export const movieService = {
   getSimilar: (id) => api.get(`/movies/${id}/similar`),
   getStats: (industry) => api.get('/movies/stats/overview', { params: { industry } }),
   recommend: (data) => api.post('/movies/recommend', data),
+  schedule: (movieData) => api.post('/movies/schedule', movieData),
 };
 
 // Predictions API

@@ -20,8 +20,10 @@ from sklearn.model_selection import (
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import (
     RandomForestRegressor, GradientBoostingClassifier,
-    VotingRegressor, VotingClassifier, GradientBoostingRegressor
+    StackingRegressor, StackingClassifier, GradientBoostingRegressor
 )
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import Ridge, LogisticRegression
 from sklearn.metrics import (
     mean_absolute_error, r2_score, accuracy_score,
     classification_report, f1_score
@@ -205,6 +207,47 @@ class MovieFeatureEngineer:
             features['trailer_comments'] = 0
             features['trailer_engagement_ratio'] = 0
             features['trailer_views_log'] = 0
+
+        # ─── DERIVED / INTERACTION FEATURES ─────────────────────
+        # Inflation-adjusted budget (to 2024 dollars, 3% annual)
+        features['budget_adjusted'] = features['budget'] * (1.03 ** (2024 - features['year']))
+
+        # Cyclic month encoding (captures seasonal circularity)
+        features['month_sin'] = np.sin(2 * np.pi * features['release_month'] / 12)
+        features['month_cos'] = np.cos(2 * np.pi * features['release_month'] / 12)
+
+        # Cast max popularity (strongest single star)
+        def get_cast_max_popularity(cast):
+            if isinstance(cast, list) and len(cast) > 0:
+                pops = [c.get('popularity', 0) for c in cast if isinstance(c, dict)]
+                return max(pops) if pops else 0
+            return 0
+        features['cast_max_popularity'] = movies_df['cast'].apply(get_cast_max_popularity)
+
+        # Genre count
+        features['genre_count'] = movies_df['genres'].apply(
+            lambda x: len(x) if isinstance(x, list) else 1
+        )
+
+        # Log budget (better distribution)
+        features['log_budget'] = np.log1p(features['budget'])
+
+        # Release quarter
+        features['release_quarter'] = (features['release_month'] - 1) // 3 + 1
+
+        # Budget per minute
+        features['budget_per_minute'] = features['budget'] / features['runtime'].clip(lower=60)
+
+        # Budget × cast popularity interaction
+        features['budget_x_cast_pop'] = features['budget'] * features['cast_popularity']
+
+        # Budget per talent (budget efficiency relative to star power)
+        total_talent = (features['director_popularity'] + features['cast_popularity']).clip(lower=0.1)
+        features['budget_per_talent'] = features['budget'] / total_talent
+        features['log_budget_per_talent'] = np.log1p(features['budget_per_talent'])
+
+        # Talent synergy (director × cast interaction)
+        features['talent_synergy'] = features['director_popularity'] * features['cast_popularity']
 
         # Drop non-numeric columns
         features = features.drop(columns=['primary_genre', 'industry'], errors='ignore')
@@ -405,6 +448,25 @@ class OptunaHyperparamTuner:
         print(f"   ✓ Best params: {study.best_params}")
         return study.best_params
 
+    def tune_knn_regressor(self, X, y):
+        """Optuna tuning for KNN Regressor"""
+        print("\n   Tuning KNN Regressor...")
+
+        def objective(trial):
+            params = {
+                'n_neighbors': trial.suggest_int('n_neighbors', 3, 30),
+                'weights': trial.suggest_categorical('weights', ['uniform', 'distance']),
+                'p': trial.suggest_int('p', 1, 2)
+            }
+            model = KNeighborsRegressor(**params, n_jobs=-1)
+            return cross_val_score(model, X, y, cv=3, scoring='r2').mean()
+
+        study = optuna.create_study(direction='maximize')
+        study.optimize(objective, n_trials=self.n_trials)
+        self.best_params['knn_regressor'] = study.best_params
+        print(f"   ✓ Best R² (CV): {study.best_value:.4f}")
+        return study.best_params
+
     def save_best_params(self, filepath):
         """Save best parameters to JSON"""
         # Convert numpy types to Python types for JSON serialization
@@ -501,6 +563,7 @@ class MovieModelTrainer:
         rf_params = self.tuner.tune_rf_regressor(X_train_scaled, y_train)
         xgb_params = self.tuner.tune_xgb_regressor(X_train_scaled, y_train)
         lgbm_params = self.tuner.tune_lgbm_regressor(X_train_scaled, y_train)
+        knn_params = self.tuner.tune_knn_regressor(X_train_scaled, y_train)
 
         # ── Step 2: Train individual models with best params ──
         print("\n🏋️ STEP 2: Training Individual Models")
@@ -530,43 +593,32 @@ class MovieModelTrainer:
         lgbm_mae = mean_absolute_error(y_test, lgbm_pred)
         print(f"   LightGBM       → R²: {lgbm_r2:.4f}, MAE: {lgbm_mae:.4f}")
 
-        # ── Step 3: Create Ensemble ──
-        print("\n🤝 STEP 3: Ensemble Model (Weighted Voting)")
+        # KNN
+        knn_model = KNeighborsRegressor(**knn_params, n_jobs=-1)
+        knn_model.fit(X_train_scaled, y_train)
+        knn_pred = knn_model.predict(X_test_scaled)
+        knn_r2 = r2_score(y_test, knn_pred)
+        knn_mae = mean_absolute_error(y_test, knn_pred)
+        print(f"   KNN            → R²: {knn_r2:.4f}, MAE: {knn_mae:.4f}")
+
+        # ── Step 3: Create Ensemble (StackingRegressor) ──
+        print("\n🤝 STEP 3: Ensemble Model (Stacking with Ridge Meta-learner)")
         print("─" * 40)
 
-        # Weighted based on individual R² scores
-        total_r2 = rf_r2 + xgb_r2 + lgbm_r2
-        weights = [rf_r2 / total_r2, xgb_r2 / total_r2, lgbm_r2 / total_r2]
-        print(f"   Weights: RF={weights[0]:.3f}, XGB={weights[1]:.3f}, LGBM={weights[2]:.3f}")
-
-        # Weighted average prediction
-        ensemble_pred = (
-            weights[0] * rf_pred +
-            weights[1] * xgb_pred +
-            weights[2] * lgbm_pred
+        # Stacking Ensemble
+        ensemble_model = StackingRegressor(
+            estimators=[
+                ('rf', RandomForestRegressor(**rf_params, random_state=42, n_jobs=-1)),
+                ('xgb', XGBRegressor(**xgb_params, random_state=42, n_jobs=-1, verbosity=0)),
+                ('lgbm', LGBMRegressor(**lgbm_params, random_state=42, n_jobs=-1, verbose=-1)),
+                ('knn', KNeighborsRegressor(**knn_params, n_jobs=-1))
+            ],
+            final_estimator=Ridge()
         )
-        ensemble_r2 = r2_score(y_test, ensemble_pred)
-        ensemble_mae = mean_absolute_error(y_test, ensemble_pred)
-        print(f"   Ensemble       → R²: {ensemble_r2:.4f}, MAE: {ensemble_mae:.4f}")
 
         # ── Step 4: Cross-Validation on best approach ──
         print("\n📊 STEP 4: 5-Fold Cross-Validation")
         print("─" * 40)
-
-        # Pick the best single model for official CV
-        model_scores = {'RF': rf_r2, 'XGB': xgb_r2, 'LGBM': lgbm_r2, 'Ensemble': ensemble_r2}
-        best_name = max(model_scores, key=model_scores.get)
-        print(f"   Best approach: {best_name} (R²: {model_scores[best_name]:.4f})")
-
-        # We'll use VotingRegressor for proper CV of the ensemble
-        ensemble_model = VotingRegressor(
-            estimators=[
-                ('rf', RandomForestRegressor(**rf_params, random_state=42, n_jobs=-1)),
-                ('xgb', XGBRegressor(**xgb_params, random_state=42, n_jobs=-1, verbosity=0)),
-                ('lgbm', LGBMRegressor(**lgbm_params, random_state=42, n_jobs=-1, verbose=-1))
-            ],
-            weights=weights
-        )
 
         cv_scores = cross_val_score(ensemble_model, X_train_scaled, y_train, cv=5, scoring='r2')
         print(f"   CV Scores: {[f'{s:.4f}' for s in cv_scores]}")
@@ -582,10 +634,9 @@ class MovieModelTrainer:
 
         # Store results for comparison
         self.training_results['revenue'] = {
-            'rf_r2': rf_r2, 'xgb_r2': xgb_r2, 'lgbm_r2': lgbm_r2,
+            'rf_r2': rf_r2, 'xgb_r2': xgb_r2, 'lgbm_r2': lgbm_r2, 'knn_r2': knn_r2,
             'ensemble_r2': final_r2, 'ensemble_mae': final_mae,
-            'cv_mean': cv_scores.mean(), 'cv_std': cv_scores.std(),
-            'weights': weights
+            'cv_mean': cv_scores.mean(), 'cv_std': cv_scores.std()
         }
 
         print(f"\n   ✅ Final Ensemble R²: {final_r2:.4f}")
@@ -650,11 +701,11 @@ class MovieModelTrainer:
         lgbm_acc = accuracy_score(y_test, lgbm_pred)
         print(f"   LightGBM       → Accuracy: {lgbm_acc:.4f}")
 
-        # ── Step 3: Ensemble Voting Classifier ──
-        print("\n🤝 STEP 3: Ensemble Voting Classifier")
+        # ── Step 3: Ensemble Stacking Classifier ──
+        print("\n🤝 STEP 3: Ensemble Stacking Classifier")
         print("─" * 40)
 
-        ensemble_cls = VotingClassifier(
+        ensemble_cls = StackingClassifier(
             estimators=[
                 ('gb', GradientBoostingClassifier(
                     n_estimators=150, max_depth=5, learning_rate=0.1, random_state=42
@@ -667,7 +718,7 @@ class MovieModelTrainer:
                     **lgbm_cls_params, random_state=42, n_jobs=-1, verbose=-1
                 ))
             ],
-            voting='soft'  # Use probability-based voting
+            final_estimator=LogisticRegression(max_iter=1000)
         )
 
         # ── Step 4: Stratified K-Fold Cross-Validation ──
