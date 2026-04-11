@@ -39,40 +39,57 @@ The JSON must follow this exact structure:
 Here is the script text to analyze:
 `;
 
+/** Helper: wait for N milliseconds */
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
- * Call Gemini REST API directly (no SDK dependency)
+ * Call Gemini REST API directly with retry logic for rate limits
  */
-const callGeminiREST = async (modelName, prompt) => {
+const callGeminiREST = async (modelName, prompt, retryCount = 0) => {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
 
-    const response = await axios.post(url, {
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-        }
-    }, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 60000, // 60 second timeout
-    });
+    try {
+        const response = await axios.post(url, {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 4096,
+            }
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 90000, // 90 second timeout
+        });
 
-    // Extract the text from Gemini's response structure
-    const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-        throw new Error('Empty response from Gemini API');
+        const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+            throw new Error('Empty response from Gemini API');
+        }
+        return text;
+
+    } catch (err) {
+        const status = err.response?.status;
+
+        // If rate limited (429) or temporarily overloaded (503), wait and retry up to 2 times
+        if ((status === 429 || status === 503) && retryCount < 2) {
+            const waitTime = (retryCount + 1) * 15; // 15s, then 30s
+            console.log(`⏳ Rate limited on "${modelName}". Waiting ${waitTime}s before retry ${retryCount + 1}/2...`);
+            await sleep(waitTime * 1000);
+            return callGeminiREST(modelName, prompt, retryCount + 1);
+        }
+
+        throw err; // re-throw if retries exhausted or different error
     }
-    return text;
 };
 
 /**
- * Analyze script text using Gemini AI with automatic model fallback
+ * Analyze script text using Gemini AI with automatic retry + model fallback
  * @param {string} scriptText - The extracted text from the uploaded script
  * @returns {Object} The structured analysis result
  */
 const analyzeScript = async (scriptText) => {
-    // Truncate to ~20,000 chars to stay within free-tier token limits
-    const truncated = scriptText.length > 20000
-        ? scriptText.substring(0, 20000) + '\n\n[...script truncated for analysis...]'
+    // Truncate to ~15,000 chars to reduce token usage and avoid rate limits
+    const truncated = scriptText.length > 15000
+        ? scriptText.substring(0, 15000) + '\n\n[...script truncated for analysis...]'
         : scriptText;
 
     const fullPrompt = ANALYSIS_PROMPT + truncated;
@@ -104,29 +121,25 @@ const analyzeScript = async (scriptText) => {
 
         } catch (err) {
             lastError = err;
-            // Get the HTTP status code from axios error if available
             const status = err.response?.status;
             const errorMsg = err.response?.data?.error?.message || err.message;
             console.warn(`⚠️ Model "${modelName}" failed (HTTP ${status || 'N/A'}): ${errorMsg}`);
 
-            // If it's a retryable error (overloaded, rate limit, not found), try next model
+            // Retryable errors — move to next model
             if (status === 503 || status === 429 || status === 404 || status === 500) {
                 continue;
             }
-            // JSON parse failure — try next model
             if (err instanceof SyntaxError) {
                 continue;
             }
-            // For network errors, try next model too
             if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'ENOTFOUND') {
                 continue;
             }
-            // For any other error (e.g. 400 bad API key), stop
+            // Non-retryable (e.g. 400 bad key) — stop
             throw new Error(`Gemini API Error: ${errorMsg}`);
         }
     }
 
-    // If all models failed
     console.error('❌ All Gemini models failed. Last error:', lastError?.message);
     throw new Error('All AI models are currently unavailable. Please try again in a few minutes.');
 };
